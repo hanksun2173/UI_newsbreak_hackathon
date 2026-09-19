@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Follow-ups</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0d0a24;color:#f3f0ff}
+a{color:#b7a7ff}a:hover{color:#d3c9ff}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1400px; box-sizing: border-box; display: flex; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+
+<!-- SIDEBAR -->
+<div style="width: 250px; flex-shrink: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 20px; background: #120c38; border-right: 1px solid #2a2360;">
+<div style="display: flex; flex-direction: column; gap: 48px;">
+<div style="padding: 0 14px; font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; letter-spacing: -0.01em; color: #ffffff;">[Product name]</div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 17px;">
+<a href="App.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Home</a>
+<a href="Plan.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Plan</a>
+<a href="Events.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Events</a>
+<a href="People.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">People</a>
+<a href="FollowUps.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; background: rgba(255,255,255,0.12); color: #ffffff; text-decoration: none; font-weight: 700;">Follow-ups</a>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 14px; padding: 0 14px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; background: #ffc93c; color: #1a1440; font-size: 16px; font-weight: 700;">H</div>
+<div style="font-size: 16px; font-weight: 600; color: #ffffff;">Hank</div>
+</div>
+</div>
+
+<!-- MAIN -->
+<div style="flex-grow: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px; padding: 56px 64px 64px 64px;">
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -0.02em;">Follow-ups</h1>
+<div style="font-size: 19px; color: #a9a3cf;">{{ summary }}</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px; align-items: start;">
+
+<!-- Task list -->
+<div style="grid-column: span 8; display: flex; flex-direction: column; gap: 32px; padding: 36px 40px 40px 40px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
+<div style="display: flex; gap: 8px; padding: 6px; background: #3a1a22; border-radius: 999px; width: 420px;">
+<sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
+<button type="button" onClick="{{ tab.pick }}" aria-pressed="{{ tab.active }}" style="{{ tab.style }}">{{ tab.label }}</button>
+</sc-for>
+</div>
+
+<sc-for list="{{ sections }}" as="sec" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 8px;">
+<div style="{{ sec.dotStyle }}"></div>
+<h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 30px; letter-spacing: -0.01em;">{{ sec.label }}</h2>
+</div>
+<sc-for list="{{ sec.tasks }}" as="task" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 20px; padding: 28px 0; border-top: 1px solid #2a2360;">
+<div style="display: flex; align-items: flex-start; gap: 16px;">
+<button type="button" onClick="{{ task.toggle }}" aria-pressed="{{ task.done }}" aria-label="{{ task.label }}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -10px 0 -10px -10px; flex-shrink: 0; border: 0; background: transparent; cursor: pointer;">
+<span style="{{ task.boxStyle }}">
+<sc-if value="{{ task.done }}" hint-placeholder-val="{{ false }}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+</sc-if>
+</span>
+</button>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
+<div style="{{ task.textStyle }}">{{ task.text }}</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+<div style="display: flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: #2e2470; color: #b7a7ff; font-size: 14px; font-weight: 600;">{{ task.person }}</div>
+<div style="font-size: 15px; color: #a9a3cf;">{{ task.source }}</div>
+</div>
+</div>
+<div style="{{ task.dueStyle }}">{{ task.due }}</div>
+</div>
+<sc-if value="{{ task.canDraft }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px; margin-left: 40px;">
+<button type="button" onClick="{{ task.toggleDraft }}" aria-expanded="{{ task.draftOpen }}" style="align-self: flex-start; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 2px solid #5b3df5; background: #161141; color: #b7a7ff; font-size: 15px; font-weight: 600; cursor: pointer;">{{ task.draftLabel }}</button>
+<sc-if value="{{ task.draftOpen }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px; padding: 24px 26px; background: #241c52; border-radius: 18px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Draft from your companion</div>
+<div style="font-size: 16px; line-height: 1.6;">{{ task.draft }}</div>
+<div style="display: flex; gap: 12px;">
+<button type="button" onClick="{{ task.toggle }}" style="min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: #5b3df5; color: #ffffff; font-size: 15px; font-weight: 700; cursor: pointer;">Mark as sent</button>
+<button type="button" style="min-height: 48px; padding: 0 24px; border: 2px solid #3a3080; border-radius: 999px; background: #161141; color: #b7a7ff; font-size: 15px; font-weight: 600; cursor: pointer;">Copy draft</button>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+
+<!-- Side column -->
+<div style="grid-column: span 4; display: flex; flex-direction: column; gap: 32px;">
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 28px; background: #ff5a4e; border-radius: 24px; color: #1a1440;">
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 64px; line-height: 1;">{{ openCount }}</div>
+<div style="font-size: 16px; font-weight: 600;">Open</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 28px; background: #14c8a8; border-radius: 24px; color: #1a1440;">
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 64px; line-height: 1;">{{ doneCount }}</div>
+<div style="font-size: 16px; font-weight: 600;">Done</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 32px 32px 16px 32px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 12px;">
+<div style="width: 14px; height: 14px; border-radius: 999px; background: #ffc93c;"></div>
+<h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 28px; letter-spacing: -0.01em;">Suggested for you</h2>
+</div>
+<sc-for list="{{ ideas }}" as="idea" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 24px 0; border-top: 1px solid #2a2360;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<div style="font-size: 17px; font-weight: 600; line-height: 1.4;">{{ idea.text }}</div>
+<div style="font-size: 15px; line-height: 1.45; color: #a9a3cf;">{{ idea.why }}</div>
+</div>
+<button type="button" onClick="{{ idea.toggle }}" aria-pressed="{{ idea.added }}" style="{{ idea.btnStyle }}">{{ idea.btnLabel }}</button>
+</div>
+</sc-for>
+</div>
+
+</div>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = {
+filter: 'all',
+done: { t1: false, t2: false, t3: false, t4: true, a1: false, a2: false },
+added: { a1: false, a2: false },
+drafts: { t1: true }
+};
+}
+renderVals() {
+const st = this.state;
+const base = [
+{ id: 't1', text: 'Send Priya the article on onboarding tools', person: 'Priya Nair', source: 'Demo Night', due: 'Today', bucket: 'Today', draft: 'Hi Priya, it was great talking onboarding with you at Demo Night. Here is the article I mentioned: [link]. I would love to hear what you think, and I will see you at the meetup on Tuesday.' },
+{ id: 't2', text: 'Introduce Daniel to Sofia', person: 'Marcus Webb', source: 'Coffee with Marcus', due: 'Mon', bucket: 'This week', draft: 'Hi Daniel, meet Sofia Lindqvist, who hosts a monthly dinner for community builders near you. Sofia, Daniel is speaking on Saturday about the tools he is building. I think you two will have plenty to talk about.' },
+{ id: 't3', text: 'Share the deck with Ana', person: 'Ana Ruiz', source: 'Founders & Friends', due: 'Wed', bucket: 'This week', draft: 'Hi Ana, as promised, here is the deck: [link]. Happy to walk you through it whenever suits you.' },
+{ id: 't4', text: 'Thank Marcus for the referral', person: 'Marcus Webb', source: 'Coffee with Marcus', due: 'Done', bucket: 'This week', draft: '' },
+{ id: 'a1', text: 'Ask Ana about the October venue', person: 'Ana Ruiz', source: 'Founders & Friends', due: 'Thu', bucket: 'This week', draft: 'Hi Ana, is the October meetup staying at the same venue? I would like to bring a couple of people along.', ext: true },
+{ id: 'a2', text: 'Send Maya a note before Thursday', person: 'Maya Chen', source: 'Coffee with Maya', due: 'Wed', bucket: 'This week', draft: 'Hi Maya, looking forward to Thursday. I read your post about the four-day week and would love to hear how it went.', ext: true }
+];
+const ideas = [
+{ id: 'a1', text: 'Ask Ana about the October venue', why: 'You mentioned bringing people to the next meetup.' },
+{ id: 'a2', text: 'Send Maya a note before Thursday', why: 'A short hello before your first coffee usually helps.' }
+];
+const live = base.filter((t) => !t.ext || st.added[t.id]);
+const isDone = (t) => !!st.done[t.id];
+const openCount = live.filter((t) => !isDone(t)).length;
+const doneCount = live.filter(isDone).length;
+
+const tabDefs = [
+{ id: 'all', label: 'All' },
+{ id: 'open', label: 'Open (' + openCount + ')' },
+{ id: 'done', label: 'Done (' + doneCount + ')' }
+];
+const tabs = tabDefs.map((t) => {
+const active = st.filter === t.id;
+return {
+label: t.label,
+active: active,
+style: 'flex:1;min-height:48px;border:0;border-radius:999px;font-size:16px;font-weight:600;cursor:pointer;' + (active ? 'background:#ff5a4e;color:#1a1440;' : 'background:transparent;color:#ff8d84;'),
+pick: () => this.setState({ filter: t.id })
+};
+});
+
+const shaped = (t) => {
+const done = isDone(t);
+const dOpen = !!st.drafts[t.id];
+return {
+...t,
+done: done,
+due: done ? 'Done' : t.due,
+label: (done ? 'Mark not done: ' : 'Mark done: ') + t.text,
+boxStyle: 'display:flex;align-items:center;justify-content:center;width:24px;height:24px;box-sizing:border-box;border-radius:8px;border:2px solid ' + (done ? '#5b3df5' : '#8a80c9') + ';background:' + (done ? '#5b3df5' : '#ffffff') + ';',
+textStyle: 'font-size:19px;font-weight:600;line-height:1.4;' + (done ? 'color:#8d87b5;text-decoration:line-through;' : 'color:#f3f0ff;'),
+dueStyle: 'font-size:13px;font-weight:700;white-space:nowrap;padding:6px 12px;border-radius:999px;' + (t.bucket === 'Today' && !done ? 'background:#4a1d1f;color:#ff8d84;' : 'background:#2e2470;color:#b7a7ff;'),
+canDraft: !done && !!t.draft,
+draftOpen: dOpen,
+draftLabel: dOpen ? 'Hide draft' : 'Draft with companion',
+toggle: () => this.setState({ done: { ...st.done, [t.id]: !done } }),
+toggleDraft: () => this.setState({ drafts: { ...st.drafts, [t.id]: !dOpen } })
+};
+};
+
+const sectionDefs = [
+{ label: 'Today', color: '#ff5a4e', pick: (t) => !isDone(t) && t.bucket === 'Today' },
+{ label: 'This week', color: '#5b3df5', pick: (t) => !isDone(t) && t.bucket === 'This week' },
+{ label: 'Completed', color: '#14c8a8', pick: (t) => isDone(t) }
+];
+const sections = sectionDefs
+.filter((s) => !(st.filter === 'open' && s.label === 'Completed') && !(st.filter === 'done' && s.label !== 'Completed'))
+.map((s) => ({ label: s.label, dotStyle: 'width:14px;height:14px;border-radius:999px;background:' + s.color + ';', tasks: live.filter(s.pick).map(shaped) }))
+.filter((s) => s.tasks.length > 0);
+
+const ideasShaped = ideas.map((i) => {
+const added = !!st.added[i.id];
+return {
+...i,
+added: added,
+btnLabel: added ? 'Added to your list' : 'Add to follow-ups',
+btnStyle: 'align-self:flex-start;min-height:46px;padding:0 20px;border-radius:999px;font-size:15px;font-weight:600;cursor:pointer;' + (added ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#161141;color:#b7a7ff;border:2px solid #5b3df5;'),
+toggle: () => this.setState({ added: { ...st.added, [i.id]: !added } })
+};
+});
+
+return {
+tabs: tabs,
+sections: sections,
+ideas: ideasShaped,
+openCount: openCount,
+doneCount: doneCount,
+summary: openCount + ' open, ' + doneCount + ' done. Most come from people you met this month.'
+};
+}
+}
+</script>
+</body>
+</html>

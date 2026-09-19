@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0d0a24;color:#f3f0ff}
+a{color:#b7a7ff}a:hover{color:#d3c9ff}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1600px; box-sizing: border-box; display: flex; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+
+<!-- SIDEBAR -->
+<div style="width: 250px; flex-shrink: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 20px; background: #120c38; border-right: 1px solid #2a2360;">
+<div style="display: flex; flex-direction: column; gap: 48px;">
+<div style="padding: 0 14px; font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; letter-spacing: -0.01em; color: #ffffff;">[Product name]</div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 17px;">
+<a href="App.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Home</a>
+<a href="Plan.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; background: rgba(255,255,255,0.12); color: #ffffff; text-decoration: none; font-weight: 700;">Plan</a>
+<a href="Events.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Events</a>
+<a href="People.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">People</a>
+<a href="FollowUps.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Follow-ups</a>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 14px; padding: 0 14px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; background: #ffc93c; color: #1a1440; font-size: 16px; font-weight: 700;">H</div>
+<div style="font-size: 16px; font-weight: 600; color: #ffffff;">Hank</div>
+</div>
+</div>
+
+<!-- MAIN -->
+<div style="flex-grow: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px; padding: 56px 64px 64px 64px;">
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -0.02em;">Proposed plan</h1>
+<div style="font-size: 19px; color: #a9a3cf;">Sep 19 to 26, built from your schedule, your interests, and the people you've met. Skip anything that doesn't fit.</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px; align-items: start;">
+
+<!-- Agenda -->
+<div style="grid-column: span 8; display: flex; flex-direction: column; gap: 40px; padding: 40px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
+<sc-for list="{{ days }}" as="day" hint-placeholder-count="4">
+<div style="display: flex; align-items: flex-start; gap: 28px;">
+<div style="{{ day.chipStyle }}">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">{{ day.day }}</div>
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 32px; line-height: 1;">{{ day.date }}</div>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px;">
+<sc-for list="{{ day.items }}" as="it" hint-placeholder-count="1">
+<div style="{{ it.cardStyle }}">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="{{ it.pillStyle }}">{{ it.kindLabel }}</div>
+<sc-if value="{{ it.isNew }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: #3d3210; color: #ffd86b; font-size: 14px; font-weight: 600;">New idea</div>
+</sc-if>
+<div style="font-size: 15px; color: #a9a3cf;">{{ it.time }}</div>
+</div>
+<div style="{{ it.titleStyle }}">{{ it.title }}</div>
+<div style="font-size: 15px; line-height: 1.55; color: #a9a3cf;">{{ it.why }}</div>
+</div>
+<button type="button" onClick="{{ it.toggle }}" aria-pressed="{{ it.skipped }}" style="{{ it.btnStyle }}">{{ it.btnLabel }}</button>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+
+<!-- Summary -->
+<div style="grid-column: span 4; display: flex; flex-direction: column; gap: 28px; padding: 36px; background: #241c52; border: 1px solid #3a3080; border-radius: 28px;">
+<div style="display: flex; align-items: center; gap: 14px;">
+<div style="width: 14px; height: 14px; border-radius: 999px; background: #ffc93c;"></div>
+<h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 30px; letter-spacing: -0.01em;">This plan</h2>
+</div>
+<div style="display: flex; flex-direction: column;">
+<div style="display: flex; align-items: baseline; gap: 18px; padding: 20px 0; border-top: 1px solid #3a3080;">
+<div style="width: 64px; font-family: 'Instrument Serif', Georgia, serif; font-size: 56px; line-height: 1; color: #b7a7ff;">{{ eventCount }}</div>
+<div style="font-size: 17px; font-weight: 600;">Events and meetings</div>
+</div>
+<div style="display: flex; align-items: baseline; gap: 18px; padding: 20px 0; border-top: 1px solid #3a3080;">
+<div style="width: 64px; font-family: 'Instrument Serif', Georgia, serif; font-size: 56px; line-height: 1; color: #4be3c6;">{{ peopleCount }}</div>
+<div style="font-size: 17px; font-weight: 600;">People you'll see</div>
+</div>
+<div style="display: flex; align-items: baseline; gap: 18px; padding: 20px 0; border-top: 1px solid #3a3080;">
+<div style="width: 64px; font-family: 'Instrument Serif', Georgia, serif; font-size: 56px; line-height: 1; color: #ff8d84;">{{ followCount }}</div>
+<div style="font-size: 17px; font-weight: 600;">Follow-ups to send</div>
+</div>
+</div>
+<button type="button" onClick="{{ approve }}" aria-pressed="{{ approved }}" style="{{ approveStyle }}">{{ approveLabel }}</button>
+<div style="font-size: 15px; line-height: 1.55; color: #a9a3cf;">{{ approveNote }}</div>
+</div>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1600}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { skipped: {}, approved: false };
+}
+renderVals() {
+const st = this.state;
+const kinds = {
+event: { label: 'Event', pill: 'background:#2e2470;color:#b7a7ff;' },
+meeting: { label: 'Coffee', pill: 'background:#0d3d3a;color:#4be3c6;' },
+follow: { label: 'Follow-up', pill: 'background:#4a1d1f;color:#ff8d84;' }
+};
+const all = [
+{ id: 'p1', day: 'Sat', date: '19', kind: 'follow', time: 'Today · about 10 min', title: 'Send Priya the article on onboarding tools', why: 'You are still fresh from Demo Night, and you will see Priya again on Tuesday.', who: ['Priya Nair'] },
+{ id: 'p2', day: 'Mon', date: '21', kind: 'follow', time: 'About 15 min', title: 'Introduce Daniel to Sofia', why: 'You promised Marcus, and Daniel speaks on Saturday, so an early introduction helps.', who: ['Daniel Okafor', 'Sofia Lindqvist'] },
+{ id: 'p3', day: 'Tue', date: '22', kind: 'event', time: '6:30 pm', title: 'Founders & Friends Meetup', why: 'Your evening is free, and three people you know are going.', who: ['Priya Nair', 'Ana Ruiz', 'Maya Chen'] },
+{ id: 'p4', day: 'Wed', date: '23', kind: 'follow', time: 'Due Wed · about 10 min', title: 'Share the deck with Ana', why: 'She asked for it at the last meetup, and you will have just seen her.', who: ['Ana Ruiz'] },
+{ id: 'p5', day: 'Wed', date: '23', kind: 'follow', time: 'About 5 min', title: 'Send Maya a note before Thursday', why: 'A short hello makes your first coffee feel less like a cold start.', who: ['Maya Chen'] },
+{ id: 'p6', day: 'Thu', date: '24', kind: 'meeting', time: '3:30 pm · Corner Café', title: 'Coffee with Maya Chen', why: 'You both care about onboarding and organize local meetups.', who: ['Maya Chen'] },
+{ id: 'p7', day: 'Sat', date: '26', kind: 'event', time: '10:00 am', title: 'Climate Tech Demo Morning', why: 'Three demoing teams match your saved interests, and Daniel Okafor is speaking.', who: ['Daniel Okafor'] },
+{ id: 'p8', day: 'Sat', date: '26', kind: 'meeting', time: '11:30 am', title: 'Ask Daniel for 20 minutes after his talk', why: 'With the introduction behind you, this can be a real conversation.', who: ['Daniel Okafor'], isNew: true }
+];
+const shaped = (p) => {
+const skipped = !!st.skipped[p.id];
+const k = kinds[p.kind];
+return {
+...p,
+skipped: skipped,
+isNew: !!p.isNew,
+kindLabel: k.label,
+pillStyle: 'display:flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:600;' + k.pill,
+cardStyle: 'display:flex;align-items:flex-start;gap:24px;padding:24px 26px;border-radius:20px;background:#241c52;border:1px solid #3a3080;' + (skipped ? 'opacity:0.55;' : ''),
+titleStyle: 'font-size:21px;font-weight:700;line-height:1.3;' + (skipped ? 'text-decoration:line-through;' : ''),
+btnLabel: skipped ? 'Restore' : 'Skip',
+btnStyle: 'flex-shrink:0;min-height:44px;padding:0 20px;border-radius:999px;font-size:15px;font-weight:600;cursor:pointer;background:#161141;color:#b7a7ff;border:2px solid ' + (skipped ? '#14c8a8' : '#3a3080') + ';',
+toggle: () => this.setState({ skipped: { ...st.skipped, [p.id]: !skipped }, approved: false })
+};
+};
+const order = ['19', '21', '22', '23', '24', '26'];
+const days = order.map((d) => {
+const items = all.filter((p) => p.date === d);
+return {
+day: items[0].day,
+date: d,
+chipStyle: 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:72px;height:72px;flex-shrink:0;border-radius:20px;' + (d === '19' ? 'background:#ff5a4e;color:#1a1440;' : 'background:#5b3df5;color:#ffffff;'),
+items: items.map(shaped)
+};
+});
+const kept = all.filter((p) => !st.skipped[p.id]);
+const people = {};
+kept.forEach((p) => p.who.forEach((n) => { people[n] = true; }));
+const approved = st.approved;
+return {
+days: days,
+eventCount: kept.filter((p) => p.kind !== 'follow').length,
+followCount: kept.filter((p) => p.kind === 'follow').length,
+peopleCount: Object.keys(people).length,
+approved: approved,
+approveLabel: approved ? 'Plan approved' : 'Approve this plan',
+approveStyle: 'min-height:60px;border-radius:999px;font-size:18px;font-weight:700;cursor:pointer;' + (approved ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;'),
+approveNote: approved ? 'Your companion will remind you and have a prep brief ready before each event.' : 'Approving adds these to your schedule and follow-ups. You can change it any time.',
+approve: () => this.setState({ approved: !approved })
+};
+}
+}
+</script>
+</body>
+</html>
