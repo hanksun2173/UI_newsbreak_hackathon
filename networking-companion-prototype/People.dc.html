@@ -14,9 +14,38 @@
 body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0d0a24;color:#f3f0ff}
 a{color:#b7a7ff}a:hover{color:#d3c9ff}
 button{font-family:inherit}
+/* Map system. The scene is designed at 1062x940 and every scene length is expressed in --u (1px at design size),
+   so it scales to whatever height the stage gets. Two orbits around you: edge labels on the inner orbit (r=198),
+   people and events on the outer orbit (r=396). Edges are rotated 2px divs with a signal dot travelling along them. */
+.nm-stage{container-type:size}
+.nm-scene{--u:min(calc(100cqw / 1062),calc(100cqh / 940));position:absolute;left:50%;top:50%;width:calc(1062 * var(--u));height:calc(940 * var(--u));transform:translate(-50%,-50%)}
+@keyframes nm-pop{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+@keyframes nm-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes nm-draw-a{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes nm-draw-b{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes nm-flow{from{background-position:0 0,0 0}to{background-position:calc(18 * var(--u)) 0,0 0}}
+@keyframes nm-travel{0%{left:0%;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:100%;opacity:0}}
+@keyframes nm-pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(2);opacity:0}}
+@keyframes nm-selpulse{0%{box-shadow:0 0 0 5px #ffc93c,0 0 0 10px rgba(255,201,60,.3)}100%{box-shadow:0 0 0 5px #ffc93c,0 0 0 26px rgba(255,201,60,0)}}
+@keyframes nm-bob{from{transform:translateY(calc(-3 * var(--u)))}to{transform:translateY(calc(3 * var(--u)))}}
+@keyframes nm-slide{from{opacity:0;transform:translateX(48px)}to{opacity:1;transform:translateX(0)}}
+@keyframes nm-fade{from{opacity:0}to{opacity:1}}
+@keyframes nm-orbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes nm-ring{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes nm-zoom{from{transform:translate(0px,0px) scale(1)}to{transform:translate(var(--tx),var(--ty)) scale(var(--s))}}
+.nm-world{transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.nm-node{transition:opacity .4s ease}
+.nm-node .nm-av{transition:box-shadow .3s ease,transform .3s cubic-bezier(.2,.8,.2,1)}
+.nm-node:hover .nm-av{transform:scale(1.1);box-shadow:0 0 0 6px rgba(255,201,60,.35),0 18px 40px -10px rgba(91,61,245,.8)}
+.nm-chip{transition:opacity .4s ease}
+.nm-ev{transition:opacity .4s ease,box-shadow .3s ease,border-color .3s ease}
+.nm-ev:hover{border-color:#14c8a8;box-shadow:0 0 0 4px rgba(20,200,168,.25),0 24px 48px -16px rgba(20,200,168,.5)}
+.nm-edge{transition:opacity .4s ease}
+.nm-q{transition:background .2s ease}
+.nm-q:hover{background:#2e2470}
 </style>
 </helmet>
-<div style="width: 1440px; height: 1320px; box-sizing: border-box; display: flex; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+<div style="width: 1440px; height: 100vh; min-height: 860px; box-sizing: border-box; display: flex; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
 
 <!-- SIDEBAR -->
 <div style="width: 250px; flex-shrink: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 20px; background: #120c38; border-right: 1px solid #2a2360;">
@@ -37,154 +66,559 @@ button{font-family:inherit}
 </div>
 
 <!-- MAIN -->
-<div style="flex-grow: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px; padding: 56px 64px 64px 64px;">
+<div style="flex-grow: 1; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; padding: 40px 64px 40px 64px;">
 
-<div style="display: flex; flex-direction: column; gap: 12px;">
-<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -0.02em;">People</h1>
-<div style="font-size: 19px; color: #a9a3cf;">The people you've met, and the ones worth meeting next.</div>
-</div>
-
-<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px; align-items: start;">
-
-<!-- List -->
-<div style="grid-column: span 5; display: flex; flex-direction: column; gap: 28px; padding: 36px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
-<div style="display: flex; gap: 8px; padding: 6px; background: #241c52; border-radius: 999px;">
-<sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="2">
-<button type="button" onClick="{{ tab.pick }}" aria-pressed="{{ tab.active }}" style="{{ tab.style }}">{{ tab.label }}</button>
+<!-- Header: title + lens switch -->
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-shrink: 0;">
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 48px; line-height: 1; letter-spacing: -0.02em;">People</h1>
+<div style="display: flex; flex-shrink: 0; gap: 6px; padding: 6px; background: #161141; border: 1px solid #2c2360; border-radius: 999px;">
+<sc-for list="{{ lenses }}" as="l" hint-placeholder-count="3">
+<button type="button" onClick="{{ l.pick }}" aria-pressed="{{ l.active }}" style="{{ l.style }}">{{ l.label }}</button>
 </sc-for>
 </div>
-<form style="display: flex; align-items: center; height: 56px; box-sizing: border-box; padding: 0 22px; background: #161141; border: 2px solid #2c2360; border-radius: 999px;">
-<label for="find" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">Search people</label>
-<input id="find" type="text" placeholder="Search by name or topic" style="flex-grow: 1; min-width: 0; height: 40px; border: 0; outline: 0; background: transparent; font-family: inherit; font-size: 16px; color: #f3f0ff;">
-</form>
-<div style="display: flex; flex-direction: column; gap: 16px;">
-<sc-for list="{{ people }}" as="p" hint-placeholder-count="3">
-<button type="button" onClick="{{ p.pick }}" aria-pressed="{{ p.selected }}" style="{{ p.rowStyle }}">
-<div style="{{ p.avatarStyle }}">{{ p.initials }}</div>
-<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px;">
-<div style="font-size: 19px; font-weight: 700;">{{ p.name }}</div>
-<div style="font-size: 15px; color: #a9a3cf;">{{ p.role }}</div>
-<div style="font-size: 15px; line-height: 1.4;">{{ p.stat }}</div>
 </div>
+
+<!-- STAGE (fills whatever height is left) -->
+<div class="nm-stage" style="position: relative; flex-grow: 1; min-height: 0; overflow: hidden; border-radius: 28px; background: #100c30; border: 1px solid #2c2360;">
+
+<!-- Backdrop -->
+<div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(183,167,255,0.13) 1px, transparent 1.2px); background-size: 28px 28px; pointer-events: none;"></div>
+<div style="position: absolute; left: -160px; top: -160px; width: 520px; height: 520px; border-radius: 999px; background: radial-gradient(circle, rgba(91,61,245,0.22) 0%, rgba(91,61,245,0) 62%); pointer-events: none;"></div>
+<div style="position: absolute; right: -160px; bottom: -160px; width: 520px; height: 520px; border-radius: 999px; background: radial-gradient(circle, rgba(20,200,168,0.14) 0%, rgba(20,200,168,0) 62%); pointer-events: none;"></div>
+
+<!-- Legend -->
+<div style="position: absolute; right: 20px; top: 18px; z-index: 5; display: flex; align-items: center; gap: 18px; height: 34px; padding: 0 16px; background: rgba(13,10,36,0.8); border: 1px solid #2c2360; border-radius: 999px; font-size: 13px; font-weight: 600; color: #cdc6ee; white-space: nowrap;">
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #ffc93c;"></div>You</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #5b3df5;"></div>Person</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #14c8a8;"></div>Event</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #b7a7ff;"></div>Topic</div>
+</div>
+
+<!-- SCENE (design size 1062x940, scaled by --u) -->
+<div class="nm-scene">
+<!-- WORLD (pans and zooms toward the selection) -->
+<div class="nm-world" style="{{ worldStyle }}">
+
+<!-- Glow, radar sweep and orbits -->
+<div style="{{ glowStyle }}"></div>
+<div style="{{ sweepStyle }}"></div>
+<div style="{{ ringOuter }}"></div>
+<div style="{{ ringInner }}"></div>
+
+<!-- Edges -->
+<sc-for list="{{ edges }}" as="e" hint-placeholder-count="8">
+<div class="nm-edge" style="{{ e.wrapStyle }}"><div style="{{ e.lineStyle }}"></div><div style="{{ e.dotStyle }}"></div></div>
+<div class="nm-edge" style="{{ e.labelStyle }}">{{ e.label }}</div>
+</sc-for>
+
+<!-- Topic chips -->
+<sc-for list="{{ chips }}" as="c" hint-placeholder-count="12">
+<div class="nm-chip" style="{{ c.style }}">{{ c.text }}</div>
+</sc-for>
+
+<!-- Event nodes -->
+<sc-for list="{{ events }}" as="ev" hint-placeholder-count="2">
+<button class="nm-ev" type="button" onClick="{{ ev.pick }}" aria-pressed="{{ ev.selected }}" style="{{ ev.style }}">
+<div style="display: flex; align-items: center; gap: calc(10 * var(--u));">
+<div style="display: flex; align-items: center; justify-content: center; width: calc(30 * var(--u)); height: calc(30 * var(--u)); border-radius: calc(9 * var(--u)); background: #14c8a8; color: #1a1440;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1440" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: calc(16 * var(--u)); height: calc(16 * var(--u));"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+</div>
+<div style="font-size: calc(16 * var(--u)); font-weight: 700; line-height: 1.2; text-align: left;">{{ ev.title }}</div>
+</div>
+<div style="font-size: calc(13 * var(--u)); color: #a9a3cf; text-align: left;">{{ ev.meta }}</div>
+<div style="font-size: calc(13 * var(--u)); font-weight: 600; color: #4be3c6; text-align: left;">{{ ev.tag }}</div>
+</button>
+</sc-for>
+
+<!-- Person nodes -->
+<sc-for list="{{ people }}" as="n" hint-placeholder-count="6">
+<button class="nm-node" type="button" onClick="{{ n.pick }}" aria-pressed="{{ n.selected }}" style="{{ n.style }}">
+<div class="nm-av" style="{{ n.avStyle }}">{{ n.initials }}</div>
+<div style="font-size: calc(17 * var(--u)); font-weight: 700; line-height: 1.15;">{{ n.name }}</div>
+<div style="font-size: calc(13 * var(--u)); color: #a9a3cf; line-height: 1.3;">{{ n.role }}</div>
+<div style="{{ n.pillStyle }}">{{ n.pill }}</div>
+</button>
+</sc-for>
+
+<!-- You (center) -->
+<div style="{{ meStyle }}">
+<div style="position: relative; width: calc(116 * var(--u)); height: calc(116 * var(--u));">
+<div style="position: absolute; inset: 0; border-radius: 999px; border: 2px solid #ffc93c; animation: nm-pulse 2.8s ease-out infinite;"></div>
+<div style="position: absolute; inset: 0; border-radius: 999px; border: 2px solid #ffc93c; animation: nm-pulse 2.8s ease-out 1.4s infinite;"></div>
+<div style="position: absolute; inset: calc(-14 * var(--u)); border-radius: 999px; border: 1px dashed rgba(255,201,60,0.5); animation: nm-orbit 24s linear infinite;"></div>
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #ffc93c; color: #1a1440; font-family: 'Instrument Serif', Georgia, serif; font-size: calc(52 * var(--u)); box-shadow: 0 0 0 calc(8 * var(--u)) rgba(255,201,60,0.18), 0 30px 60px -20px rgba(255,201,60,0.7);">H</div>
+</div>
+<div style="font-size: calc(20 * var(--u)); font-weight: 700;">Hank (you)</div>
+<div style="font-size: calc(14 * var(--u)); color: #a9a3cf;">Founder · [Product name]</div>
+<div style="{{ goalStyle }}">
+<div style="display: flex; align-items: center; gap: calc(8 * var(--u)); height: calc(38 * var(--u)); padding: 0 calc(18 * var(--u)); border-radius: 999px; background: #3d3210; border: 1px solid #7a6420; color: #ffd86b; font-size: calc(15 * var(--u)); font-weight: 700; white-space: nowrap;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd86b" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="width: calc(16 * var(--u)); height: calc(16 * var(--u));"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>
+Goal: 5 design partners
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- Dim veil when a panel is open -->
+<div style="{{ veilStyle }}"></div>
+
+<!-- PERSON PANEL -->
+<sc-if value="{{ showPerson }}" hint-placeholder-val="{{ true }}">
+<div style="position: absolute; top: 0; right: 0; bottom: 0; z-index: 10; width: 500px; box-sizing: border-box; display: flex; flex-direction: column; background: #120c38; border-left: 1px solid #3a3080; box-shadow: -40px 0 80px -30px rgba(0,0,0,0.7); animation: nm-slide .5s cubic-bezier(.2,.8,.2,1) both;">
+<div style="flex-grow: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 24px 28px 28px 28px;">
+
+<button type="button" onClick="{{ back }}" style="display: flex; align-items: center; gap: 8px; align-self: flex-start; height: 36px; padding: 0 12px 0 6px; border: 0; border-radius: 999px; background: transparent; color: #b7a7ff; font-size: 15px; font-weight: 600; cursor: pointer;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b7a7ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+Back to network
+</button>
+
+<div style="display: flex; align-items: center; gap: 18px;">
+<div style="{{ p.bigAvStyle }}">{{ p.initials }}</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px;">
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 34px; line-height: 1; letter-spacing: -0.01em;">{{ p.name }}</div>
+<div style="font-size: 15px; color: #a9a3cf;">{{ p.role }}</div>
+</div>
+<div style="{{ p.statusStyle }}">{{ p.status }}</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+<a href="Plan.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: 12px; background: #2e2470; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+{{ p.calLabel }}
+</a>
+<button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border: 1px solid #3a3080; border-radius: 12px; background: transparent; color: #f3f0ff; font-size: 14px; font-weight: 700; cursor: pointer;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3f0ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>
+Message
+</button>
+<button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border: 1px solid #3a3080; border-radius: 12px; background: transparent; color: #f3f0ff; font-size: 14px; font-weight: 700; cursor: pointer;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3f0ff" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 4h16v16H4zM8 9h8M8 13h6"/></svg>
+Add note
+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; background: #3d3210; border-radius: 16px;">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #ffd86b;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd86b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 3z"/></svg>
+{{ p.whyTitle }}
+</div>
+<div style="font-size: 15px; line-height: 1.5;">{{ p.why }}</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Common ground</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<sc-for list="{{ p.common }}" as="c" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; background: #2e2470; color: #d3c9ff; font-size: 14px; font-weight: 600;">{{ c.text }}</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #161141; border: 1px solid #2c2360; border-radius: 16px;">
+<div style="font-size: 14px; font-weight: 700; color: #4be3c6;">What you can bring</div>
+<sc-for list="{{ p.bring }}" as="b" hint-placeholder-count="3">
+<div style="display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.4;">
+<div style="flex-shrink: 0; width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: #14c8a8;"></div>
+<div>{{ b.text }}</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: #161141; border: 1px solid #2c2360; border-radius: 16px;">
+<div style="font-size: 14px; font-weight: 700; color: #b7a7ff;">What you want to learn</div>
+<sc-for list="{{ p.learn }}" as="b" hint-placeholder-count="3">
+<div style="display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.4;">
+<div style="flex-shrink: 0; width: 8px; height: 8px; margin-top: 6px; border-radius: 999px; background: #5b3df5;"></div>
+<div>{{ b.text }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Suggested questions</div>
+<sc-for list="{{ p.questions }}" as="q" hint-placeholder-count="3">
+<div class="nm-q" style="display: flex; gap: 12px; padding: 12px 14px; background: #241c52; border-radius: 12px;">
+<div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 24px; height: 24px; border-radius: 999px; background: #5b3df5; color: #ffffff; font-size: 12px; font-weight: 700;">{{ q.n }}</div>
+<div style="font-size: 14px; line-height: 1.45;">{{ q.text }}</div>
+</div>
+</sc-for>
+</div>
+
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 16px 28px 20px 28px; border-top: 1px solid #2c2360; background: #120c38;">
+<button type="button" onClick="{{ p.toggleDone }}" aria-pressed="{{ p.done }}" style="{{ p.doneStyle }}">{{ p.doneLabel }}</button>
+<a href="FollowUps.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border-radius: 999px; border: 2px solid #5b3df5; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none;">Add follow-up
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+</div>
+</div>
+</sc-if>
+
+<!-- EVENT PANEL -->
+<sc-if value="{{ showEvent }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; right: 0; bottom: 0; z-index: 10; width: 500px; box-sizing: border-box; display: flex; flex-direction: column; background: #120c38; border-left: 1px solid #3a3080; box-shadow: -40px 0 80px -30px rgba(0,0,0,0.7); animation: nm-slide .5s cubic-bezier(.2,.8,.2,1) both;">
+<div style="flex-grow: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 24px 28px 28px 28px;">
+
+<button type="button" onClick="{{ back }}" style="display: flex; align-items: center; gap: 8px; align-self: flex-start; height: 36px; padding: 0 12px 0 6px; border: 0; border-radius: 999px; background: transparent; color: #b7a7ff; font-size: 15px; font-weight: 600; cursor: pointer;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b7a7ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+Back to network
+</button>
+
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; align-self: flex-start; height: 32px; padding: 0 14px; border-radius: 999px; background: #0d3d3a; color: #4be3c6; font-size: 13px; font-weight: 700;">Event · {{ ev.tag }}</div>
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 36px; line-height: 1.05; letter-spacing: -0.01em;">{{ ev.title }}</div>
+<div style="font-size: 15px; color: #a9a3cf;">{{ ev.metaLong }}</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; background: #0d3d3a; border-radius: 16px;">
+<div style="font-size: 15px; font-weight: 700; color: #4be3c6;">Why it moves your goal</div>
+<div style="font-size: 15px; line-height: 1.5;">{{ ev.why }}</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">People on this map who will be there</div>
+<sc-for list="{{ ev.who }}" as="w" hint-placeholder-count="3">
+<button type="button" onClick="{{ w.pick }}" style="display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #2c2360; border-radius: 14px; background: #161141; color: #f3f0ff; text-align: left; cursor: pointer;">
+<div style="{{ w.avStyle }}">{{ w.initials }}</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+<div style="font-size: 15px; font-weight: 700;">{{ w.name }}</div>
+<div style="font-size: 13px; color: #a9a3cf;">{{ w.note }}</div>
+</div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b7a7ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
 </button>
 </sc-for>
 </div>
-</div>
 
-<!-- Profile -->
-<div style="grid-column: span 7; display: flex; flex-direction: column; gap: 36px; padding: 44px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
-<div style="display: flex; align-items: center; gap: 28px;">
-<div style="{{ sel.bigAvatarStyle }}">{{ sel.initials }}</div>
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: -0.015em;">{{ sel.name }}</h2>
-<div style="font-size: 18px; color: #a9a3cf;">{{ sel.role }}</div>
-<div style="{{ sel.pillStyle }}">{{ sel.pillLabel }}</div>
-</div>
-</div>
-
-<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px;">
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.aLabel }}</div>
-<div style="font-size: 17px; line-height: 1.55;">{{ sel.aText }}</div>
-</div>
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.bLabel }}</div>
-<div style="font-size: 17px; line-height: 1.55;">{{ sel.bText }}</div>
-</div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 18px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.tlLabel }}</div>
-<div style="display: flex; flex-direction: column; gap: 14px;">
-<sc-for list="{{ sel.timeline }}" as="t" hint-placeholder-count="2">
-<div style="display: flex; gap: 20px; padding: 18px 22px; background: #241c52; border-radius: 16px;">
-<div style="width: 96px; flex-shrink: 0; font-size: 14px; font-weight: 700; color: #b7a7ff;">{{ t.when }}</div>
-<div style="font-size: 16px; line-height: 1.5;">{{ t.text }}</div>
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Plan for the night</div>
+<sc-for list="{{ ev.steps }}" as="q" hint-placeholder-count="3">
+<div class="nm-q" style="display: flex; gap: 12px; padding: 12px 14px; background: #241c52; border-radius: 12px;">
+<div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 24px; height: 24px; border-radius: 999px; background: #14c8a8; color: #1a1440; font-size: 12px; font-weight: 700;">{{ q.n }}</div>
+<div style="font-size: 14px; line-height: 1.45;">{{ q.text }}</div>
 </div>
 </sc-for>
 </div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">People you both know</div>
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-<sc-for list="{{ sel.mutual }}" as="m" hint-placeholder-count="2">
-<div style="display: flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 999px; background: #2e2470; color: #b7a7ff; font-size: 15px; font-weight: 600;">{{ m.name }}</div>
-</sc-for>
-</div>
-</div>
-
-<div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 26px 28px; background: #3d3210; border-radius: 20px;">
-<div style="display: flex; flex-direction: column; gap: 8px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #ffd86b;">Suggested next step</div>
-<div style="font-size: 17px; line-height: 1.5; color: #f3f0ff;">{{ sel.next }}</div>
-</div>
-<button type="button" onClick="{{ sel.toggleAct }}" aria-pressed="{{ sel.acted }}" style="{{ sel.actStyle }}">{{ sel.actLabel }}</button>
-</div>
-</div>
 
 </div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 16px 28px 20px 28px; border-top: 1px solid #2c2360; background: #120c38;">
+<button type="button" onClick="{{ ev.toggleAdd }}" aria-pressed="{{ ev.added }}" style="{{ ev.addStyle }}">{{ ev.addLabel }}</button>
+<a href="Events.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border-radius: 999px; border: 2px solid #14c8a8; color: #4be3c6; font-size: 15px; font-weight: 700; text-decoration: none;">Open prep brief
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4be3c6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+</div>
+</div>
+</sc-if>
+
+</div>
+
+<!-- Companion hint -->
+<div style="display: flex; align-items: center; gap: 18px; box-sizing: border-box; flex-shrink: 0; min-height: 72px; padding: 12px 20px 12px 20px; background: #161141; border: 1px solid #2c2360; border-radius: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; background: #ffc93c; color: #1a1440;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1440" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>
+</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #ffd86b;">Shortest path this week</div>
+<div style="font-size: 16px; line-height: 1.45;">{{ hint }}</div>
+</div>
+<a href="Plan.dc.html" style="display: flex; align-items: center; flex-shrink: 0; height: 46px; padding: 0 22px; border-radius: 999px; background: #5b3df5; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none;">See it in your plan</a>
+</div>
+
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1320}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
 class Component extends DCLogic {
 constructor(props) {
 super(props);
-this.state = { tab: 'met', sel: 'm1', acted: {} };
+this.state = { lens: 'goal', sel: null, gen: 0, intro: true, relens: false, done: {}, added: {} };
 }
 renderVals() {
 const st = this.state;
+const W = 1062, H = 940;
+const CX = 531, CY = 470;
+const R1 = 198, R2 = 396;
+const go = (patch) => this.setState({ ...patch, intro: false });
 const tones = [
 { bg: '#5b3df5', fg: '#ffffff' },
 { bg: '#ff5a4e', fg: '#1a1440' },
 { bg: '#14c8a8', fg: '#1a1440' },
 { bg: '#ffc93c', fg: '#1a1440' }
 ];
-const all = [
-{ id: 'm1', group: 'met', tone: 0, name: 'Priya Nair', role: 'Product designer, [Company]', stat: 'Met at Demo Night · 2 weeks ago', aLabel: 'Where you met', aText: 'Demo Night on Sep 5. You talked about onboarding for small teams.', bLabel: 'Common ground', bText: 'You both care about onboarding, and you both attend the Tuesday founders meetup.', tlLabel: 'History', timeline: [{ when: 'Sep 5', text: 'Talked about onboarding for small teams. She asked for the article you mentioned.' }, { when: 'Sep 22', text: 'Both on the guest list for Founders & Friends.' }], mutual: ['Ana Ruiz', 'Maya Chen'], next: 'Send Priya the article on onboarding tools before Tuesday, so you can pick the thread back up in person.' },
-{ id: 'm2', group: 'met', tone: 1, name: 'Marcus Webb', role: 'Angel investor', stat: 'Coffee chat · Sep 8', aLabel: 'Where you met', aText: 'A one-on-one coffee on Sep 8, set up through a mutual contact.', bLabel: 'Common ground', bText: 'He backs early local teams and asked about what you are building.', tlLabel: 'History', timeline: [{ when: 'Sep 8', text: 'Offered to introduce you to two founders.' }, { when: 'Sep 9', text: 'You sent a thank-you note for the referral.' }], mutual: ['Ana Ruiz'], next: 'Make the introduction between Daniel and Sofia that you promised, and let Marcus know it is done.' },
-{ id: 'm3', group: 'met', tone: 2, name: 'Ana Ruiz', role: 'Community organizer', stat: 'Founders meetup · Aug 27', aLabel: 'Where you met', aText: 'The Founders & Friends meetup on Aug 27.', bLabel: 'Common ground', bText: 'She runs the meetup and knows most of the people you keep meeting there.', tlLabel: 'History', timeline: [{ when: 'Aug 27', text: 'Asked to see your deck.' }], mutual: ['Priya Nair', 'Marcus Webb', 'Sofia Lindqvist'], next: 'Share the deck with Ana this week while the conversation is still fresh.' },
-{ id: 's1', group: 'new', tone: 2, name: 'Maya Chen', role: 'Head of growth, [Company]', stat: 'Coming to Tuesday\'s meetup', aLabel: 'Why now', aText: 'She is on the guest list for Tuesday, and you already have coffee planned on Thursday.', bLabel: 'Common ground', bText: 'You both organize small local meetups and care about onboarding for small teams.', tlLabel: 'Recent context', timeline: [{ when: 'This month', text: 'Posted about moving her team to a four-day week.' }], mutual: ['Priya Nair'], next: 'Say hello at the meetup on Tuesday, so Thursday\'s coffee is not a first meeting.' },
-{ id: 's2', group: 'new', tone: 3, name: 'Daniel Okafor', role: 'Engineer turned founder', stat: 'Speaking Saturday', aLabel: 'Why now', aText: 'He is a speaker at the Climate Tech Demo Morning on Saturday.', bLabel: 'Common ground', bText: 'He works on the kind of tools you told your companion you were curious about.', tlLabel: 'Recent context', timeline: [{ when: 'Sat, Sep 26', text: 'Listed as a speaker at the demo morning.' }], mutual: ['Marcus Webb'], next: 'Add him to your prep for Saturday and pick one question to ask after his talk.' },
-{ id: 's3', group: 'new', tone: 0, name: 'Sofia Lindqvist', role: 'Community lead, [Organization]', stat: 'Hosts a monthly dinner near you', aLabel: 'Why now', aText: 'Her next dinner is close to where you live, and you have promised to introduce her to Daniel.', bLabel: 'Common ground', bText: 'You share a wide circle in the local community scene.', tlLabel: 'Recent context', timeline: [{ when: 'Monthly', text: 'Hosts a dinner for community builders.' }], mutual: ['Ana Ruiz', 'Marcus Webb'], next: 'Ask Marcus for the introduction, or add her to your prep for the next event you both attend.' }
+const initials = (n) => n.split(' ').map((w) => w[0]).join('');
+
+// ---------- Data ----------
+const peopleData = [
+{ id: 'maya', x: 250, y: 185, tone: 2, name: 'Maya Chen', role: 'Head of growth, [Company]', pill: 'Coffee chat (Thu)', pillKind: 'warm', status: 'Coffee on Thursday', calLabel: 'View in calendar',
+whyTitle: 'Why you should talk to Maya', why: 'Maya runs growth for a small team that is exactly the profile you want as a design partner. You already have coffee on Thursday, and she is on Tuesday\'s guest list, so you can turn one meeting into two touchpoints.',
+common: ['Onboarding', 'Small teams', 'Local meetups', 'Growth loops'],
+bring: ['Your onboarding research on small teams', 'An intro to Priya, who she has met once', 'Your shared meetup calendar idea'],
+learn: ['How her team evaluates new tools', 'What broke when they moved to a four-day week', 'Whether growth would sponsor a pilot'],
+questions: ['What was the last tool your team adopted, and who pushed for it?', 'If you piloted an onboarding tool, what would you need to see in 30 days?', 'Who else in growth should I be talking to locally?'] },
+{ id: 'priya', x: 812, y: 185, tone: 0, name: 'Priya Nair', role: 'Product designer, [Company]', pill: 'Follow-up due', pillKind: 'hot', status: 'In your network', calLabel: 'View in calendar',
+whyTitle: 'Why you should talk to Priya', why: 'Priya designs onboarding for small teams and asked for your article at Demo Night. That is an open door to a design-partner conversation, and she will be at Tuesday\'s meetup.',
+common: ['Onboarding', 'Small teams', 'Demo Night', 'Tuesday meetup'],
+bring: ['The onboarding article she asked for', 'Your small-team research notes', 'An intro to Maya\'s growth team'],
+learn: ['How her team evaluates new tools', 'What a design-partner deal needs to include', 'Who else at [Company] cares about onboarding'],
+questions: ['When you redesigned onboarding, what did you wish you had measured earlier?', 'What would make a design partnership worth your team\'s time?', 'Who at [Company] decides which tools get piloted?'] },
+{ id: 'marcus', x: 135, y: 470, tone: 1, name: 'Marcus Webb', role: 'Angel investor', pill: 'Intro promised', pillKind: 'warm', status: 'In your network', calLabel: 'Schedule',
+whyTitle: 'Why you should talk to Marcus', why: 'Marcus backs early local teams and offered to introduce you to two founders. He also knows Daniel and Sofia, so he is the shortest route to both of them.',
+common: ['Early-stage teams', 'Local founders', 'Coffee on Sep 8'],
+bring: ['A one-paragraph summary of what you are building', 'The Daniel-to-Sofia intro you promised', 'Progress since your coffee'],
+learn: ['Which of his founders need better onboarding', 'What he wants to see before a pre-seed check', 'Who else angels locally'],
+questions: ['Which of your portfolio teams struggles most with onboarding new users?', 'What would you want to see from me in the next 60 days?', 'Who else locally writes early checks?'] },
+{ id: 'ana', x: 927, y: 470, tone: 2, name: 'Ana Ruiz', role: 'Community organizer', pill: 'Deck requested', pillKind: 'hot', status: 'In your network', calLabel: 'View in calendar',
+whyTitle: 'Why you should talk to Ana', why: 'Ana runs the Founders & Friends meetup and knows most of the people on this map. She asked to see your deck, which is a chance to be introduced to the room instead of working it alone.',
+common: ['Founders & Friends', 'Community building', 'Local scene'],
+bring: ['Your deck, which she asked for', 'A lightning-talk pitch for this month\'s slot', 'Help with the meetup sign-up flow'],
+learn: ['Which regulars are small-team founders', 'Whether she would host a design-partner night', 'Who is new to the scene this month'],
+questions: ['Which regulars would you introduce me to if I only had time for three?', 'Would a five-minute lightning talk on onboarding fit this month?', 'What do most first-time attendees get wrong?'] },
+{ id: 'sofia', x: 250, y: 755, tone: 0, name: 'Sofia Lindqvist', role: 'Community lead, [Organization]', pill: 'Suggested', pillKind: 'cool', status: 'Suggested', calLabel: 'Schedule',
+whyTitle: 'Why you should meet Sofia', why: 'Sofia hosts a monthly dinner for community builders near you. You promised to introduce her to Daniel, so the first conversation already has a reason.',
+common: ['Community dinners', 'Ana\'s circle', 'Marcus\'s circle'],
+bring: ['The intro to Daniel you promised', 'A seat swap: invite her to Tuesday\'s meetup', 'Your shared meetup calendar idea'],
+learn: ['Who attends her dinners', 'Whether a dinner could host design partners', 'How she keeps a community engaged'],
+questions: ['Who at your dinners is building for small teams?', 'What would make a dinner about onboarding worth hosting?', 'How did you get your first twenty regulars?'] },
+{ id: 'daniel', x: 812, y: 755, tone: 3, name: 'Daniel Okafor', role: 'Engineer turned founder', pill: 'Suggested', pillKind: 'cool', status: 'Suggested', calLabel: 'Add to prep',
+whyTitle: 'Why you should meet Daniel', why: 'Daniel is speaking at Saturday\'s demo morning and builds the climate tooling you told your companion you were curious about. Marcus knows him, so a warm intro is one message away.',
+common: ['Climate tooling', 'Marcus\'s circle', 'Demo Morning'],
+bring: ['The intro to Sofia you promised', 'A question about his talk', 'Your onboarding notes for developer tools'],
+learn: ['How he onboarded his first users', 'Whether his team needs an onboarding partner', 'What the climate scene needs'],
+questions: ['What is the hardest part of getting your first customers?', 'How do new users get set up today, and where do they drop off?', 'What would you build next with more time?'] }
 ];
-const tabDefs = [{ id: 'met', label: 'People you\'ve met' }, { id: 'new', label: 'People you could meet' }];
-const firstOf = (g) => all.filter((p) => p.group === g)[0].id;
-const tabs = tabDefs.map((t) => {
-const active = st.tab === t.id;
+const eventData = [
+{ id: 'meetup', x: 531, y: 92, title: 'Founders & Friends Meetup', meta: 'Tue, Sep 22 · 6:30 pm · [Venue]', metaLong: 'Tue, Sep 22 · 6:30 to 9:00 pm · [Venue], [Neighborhood]', tag: '3 people you know', who: ['priya', 'ana', 'maya'], whoNotes: { priya: 'Owes her the article. Pick the thread back up.', ana: 'Runs the room. Ask for three introductions.', maya: 'Say hello, so Thursday\'s coffee is warm.' },
+why: 'Three people on this map will be in one room, and Ana can introduce you to small-team founders you have not met yet. This is the densest hour of your week for design-partner conversations.',
+steps: ['Arrive early and find Ana. Ask who she would introduce you to.', 'Find Priya and hand her the article in person.', 'Say hello to Maya, then leave her a reason to continue on Thursday.'] },
+{ id: 'demo', x: 531, y: 848, title: 'Climate Tech Demo Morning', meta: 'Sat, Sep 26 · 10:00 am · [Community hall]', metaLong: 'Sat, Sep 26 · 10:00 am to 12:30 pm · [Community hall]', tag: 'Daniel is speaking', who: ['daniel'], whoNotes: { daniel: 'Speaking. Ask one question after his talk.' },
+why: 'Three demoing teams match interests you saved last month, and Daniel is speaking. Early climate teams are exactly the kind of small team that needs onboarding help.',
+steps: ['Sit near the front for Daniel\'s talk and note one specific question.', 'Visit the three demo tables your companion flagged.', 'Mention Marcus when you introduce yourself to Daniel.'] }
+];
+// side: 'l' clusters are right-aligned to x=190, 'r' clusters start at x=872
+const chipData = [
+{ who: 'maya', side: 'l', text: 'Onboarding for small teams', y: 130 }, { who: 'maya', side: 'l', text: 'Growth loops', y: 172 }, { who: 'maya', side: 'l', text: 'Four-day week', y: 214 },
+{ who: 'priya', side: 'r', text: 'Onboarding UX', y: 130 }, { who: 'priya', side: 'r', text: 'Small-team tooling', y: 172 }, { who: 'priya', side: 'r', text: 'Design partnerships', y: 214 },
+{ who: 'sofia', side: 'l', text: 'Community dinners', y: 700 }, { who: 'sofia', side: 'l', text: 'Local organizers', y: 742 }, { who: 'sofia', side: 'l', text: 'Monthly, near you', y: 784 },
+{ who: 'daniel', side: 'r', text: 'Climate tooling', y: 700 }, { who: 'daniel', side: 'r', text: 'Developer onboarding', y: 742 }, { who: 'daniel', side: 'r', text: 'First customers', y: 784 }
+];
+const byId = {};
+peopleData.forEach((p) => { byId[p.id] = { x: p.x, y: p.y }; });
+eventData.forEach((e) => { byId[e.id] = { x: e.x, y: e.y }; });
+byId.me = { x: CX, y: CY };
+
+// ---------- Lenses ----------
+const lensDefs = {
+goal: {
+label: 'Paths to your goal',
+hint: 'Say hello to Maya on Tuesday, so Thursday\'s coffee is already a design-partner conversation.',
+edges: [
+{ a: 'me', b: 'maya', label: 'Design partner candidate', t: 0.5 },
+{ a: 'me', b: 'priya', label: 'Warmest lead · article owed', t: 0.5 },
+{ a: 'me', b: 'marcus', label: 'Route to Daniel and Sofia', t: 0.5 },
+{ a: 'me', b: 'ana', label: 'Knows the whole room', t: 0.5 },
+{ a: 'me', b: 'sofia', label: 'Intro promised', t: 0.66 },
+{ a: 'me', b: 'daniel', label: 'Ask after his talk', t: 0.66 },
+{ a: 'me', b: 'meetup', label: '3 people you know are going', t: 0.52 },
+{ a: 'me', b: 'demo', label: 'Daniel is speaking', t: 0.8 }
+]
+},
+who: {
+label: 'Who knows whom',
+hint: 'Ana can introduce you to Priya, Sofia, and Marcus in one evening. Ask her first.',
+edges: [
+{ a: 'ana', b: 'priya', label: 'Both at Founders & Friends', t: 0.36 },
+{ a: 'ana', b: 'sofia', label: 'Organizer circle', t: 0.22 },
+{ a: 'marcus', b: 'sofia', label: 'Marcus can introduce', t: 0.62 },
+{ a: 'marcus', b: 'daniel', label: 'Marcus knows him', t: 0.22 },
+{ a: 'priya', b: 'maya', label: 'Met once', t: 0.5 },
+{ a: 'me', b: 'marcus', label: 'Coffee, Sep 8', t: 0.5 },
+{ a: 'me', b: 'ana', label: 'Met Aug 27', t: 0.5 }
+]
+},
+where: {
+label: 'Where you\'ll meet them',
+hint: 'Tuesday covers three people. Saturday covers Daniel. Sofia still needs an intro from Marcus.',
+edges: [
+{ a: 'meetup', b: 'priya', label: '', t: 0.5 },
+{ a: 'meetup', b: 'ana', label: 'Tue · hosting', t: 0.7 },
+{ a: 'meetup', b: 'maya', label: '', t: 0.5 },
+{ a: 'demo', b: 'daniel', label: '', t: 0.5 },
+{ a: 'me', b: 'maya', label: 'Coffee, Thu 3:30 pm', t: 0.5 },
+{ a: 'me', b: 'meetup', label: 'You are going', t: 0.52 },
+{ a: 'me', b: 'demo', label: 'On your plan', t: 0.8 }
+]
+}
+};
+const lens = lensDefs[st.lens];
+const sel = st.sel;
+const intro = st.intro;
+const drawing = intro || st.relens;
+const draw = st.gen % 2 === 0 ? 'nm-draw-a' : 'nm-draw-b';
+
+const lenses = ['goal', 'who', 'where'].map((id) => {
+const active = st.lens === id;
 return {
-label: t.label,
+label: lensDefs[id].label,
 active: active,
-style: 'flex:1;min-height:48px;border:0;border-radius:999px;font-size:15px;font-weight:600;cursor:pointer;' + (active ? 'background:#5b3df5;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
-pick: () => this.setState({ tab: t.id, sel: firstOf(t.id) })
+style: 'height:42px;padding:0 20px;border:0;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;' + (active ? 'background:#5b3df5;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
+pick: () => go({ lens: id, sel: null, gen: st.gen + 1, relens: true })
 };
 });
-const shaped = (p) => {
-const tone = tones[p.tone];
-const selected = st.sel === p.id;
-const acted = !!st.acted[p.id];
-const isMet = p.group === 'met';
+
+// ---------- Scene helpers (design px -> scaled units) ----------
+const U = (n) => 'calc(' + Number(n).toFixed(1) + ' * var(--u))';
+const box = (x, y, w, h) => 'left:' + U(x) + ';top:' + U(y) + ';width:' + U(w) + ';height:' + U(h) + ';';
+
+// ---------- Glow, sweep, orbits ----------
+const glowStyle = 'position:absolute;' + box(CX - 300, CY - 300, 600, 600) + 'border-radius:999px;background:radial-gradient(circle, rgba(255,201,60,0.14) 0%, rgba(255,201,60,0) 62%);pointer-events:none;';
+const sweepStyle = 'position:absolute;' + box(CX - R2, CY - R2, R2 * 2, R2 * 2) + 'border-radius:999px;background:conic-gradient(from 0deg, rgba(183,167,255,0) 0deg, rgba(183,167,255,0.16) 48deg, rgba(183,167,255,0) 70deg);animation:nm-orbit 16s linear infinite;pointer-events:none;';
+const ring = (r, extra) => 'position:absolute;' + box(CX - r, CY - r, r * 2, r * 2) + 'border-radius:999px;pointer-events:none;' + extra;
+const ringOuter = ring(R2, 'border:1px solid rgba(183,167,255,0.18);' + (intro ? 'animation:nm-ring .9s cubic-bezier(.2,.8,.2,1) .1s both;' : ''));
+const ringInner = ring(R1, 'border:1px dashed rgba(183,167,255,0.22);animation:nm-orbit 90s linear infinite' + (intro ? ',nm-ring .8s cubic-bezier(.2,.8,.2,1) both' : '') + ';');
+
+// ---------- Edges ----------
+const linkedTo = (id) => lens.edges.some((e) => (e.a === sel && e.b === id) || (e.b === sel && e.a === id));
+const edges = lens.edges.map((e, i) => {
+const A = byId[e.a], B = byId[e.b];
+const dx = B.x - A.x, dy = B.y - A.y;
+const len = Math.sqrt(dx * dx + dy * dy);
+const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+const hot = sel && (e.a === sel || e.b === sel);
+const dim = sel && !hot;
+const color = hot ? '#ffc93c' : (st.lens === 'where' ? '#4be3c6' : '#b7a7ff');
+const t = e.t || 0.5;
+const mx = A.x + dx * t, my = A.y + dy * t;
+const delay = (intro ? 500 : 60) + i * 90;
+const travel = (2.6 + (len / 400) * 1.6).toFixed(2);
 return {
-...p,
+label: e.label,
+wrapStyle: 'position:absolute;left:' + U(A.x) + ';top:' + U(A.y) + ';width:' + U(len) + ';height:2px;transform-origin:0 50%;transform:rotate(' + ang.toFixed(2) + 'deg);opacity:' + (dim ? 0.15 : 1) + ';pointer-events:none;',
+lineStyle: 'width:100%;height:100%;transform-origin:0 50%;background-image:repeating-linear-gradient(90deg,' + color + ' 0 ' + U(7) + ',transparent ' + U(7) + ' ' + U(18) + '),linear-gradient(90deg,' + color + ',' + color + ');background-size:' + U(18) + ' 2px,100% 2px;background-repeat:repeat-x,no-repeat;opacity:' + (hot ? 1 : 0.5) + ';animation:' + (drawing ? draw + ' .8s cubic-bezier(.2,.7,.2,1) ' + delay + 'ms both,' : '') + 'nm-flow 1.1s linear infinite;' + (hot ? 'box-shadow:0 0 12px rgba(255,201,60,.6);' : ''),
+dotStyle: 'position:absolute;top:50%;left:0;width:' + U(7) + ';height:' + U(7) + ';margin:' + U(-3.5) + ' 0 0 ' + U(-3.5) + ';border-radius:999px;background:' + (hot ? '#ffd86b' : '#ffffff') + ';box-shadow:0 0 ' + U(10) + ' ' + color + ',0 0 ' + U(3) + ' #ffffff;animation:nm-travel ' + travel + 's cubic-bezier(.45,0,.55,1) ' + ((drawing ? delay + 700 : 0) + i * 430) + 'ms infinite;opacity:0;',
+labelStyle: 'position:absolute;left:' + U(mx) + ';top:' + U(my) + ';transform:translate(-50%,-50%);box-sizing:border-box;height:' + U(28) + ';display:flex;align-items:center;padding:0 ' + U(12) + ';border-radius:999px;font-size:' + U(12) + ';font-weight:600;white-space:nowrap;pointer-events:none;opacity:' + (dim ? 0.12 : 1) + ';' + (drawing ? 'animation:nm-fade .5s ease ' + (delay + 450) + 'ms both;' : '') + (hot ? 'background:#3d3210;border:1px solid #ffc93c;color:#ffd86b;' : 'background:#100c30;border:1px solid #2c2360;color:#cdc6ee;') + (e.label ? '' : 'display:none;')
+};
+});
+
+// ---------- Nodes ----------
+const pillTones = {
+hot: 'background:#4a1d1f;color:#ff8d84;',
+warm: 'background:#3d3210;color:#ffd86b;',
+cool: 'background:#0d3d3a;color:#4be3c6;'
+};
+const people = peopleData.map((p, i) => {
+const tone = tones[p.tone];
+const selected = sel === p.id;
+const dim = sel && !selected && !linkedTo(p.id);
+return {
+name: p.name, role: p.role, pill: p.pill,
+initials: initials(p.name),
 selected: selected,
-initials: p.name.split(' ').map((w) => w[0]).join(''),
-avatarStyle: 'display:flex;align-items:center;justify-content:center;width:56px;height:56px;flex-shrink:0;border-radius:999px;font-size:18px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
-bigAvatarStyle: 'display:flex;align-items:center;justify-content:center;width:96px;height:96px;flex-shrink:0;border-radius:999px;font-size:32px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
-rowStyle: 'display:flex;align-items:center;gap:20px;width:100%;box-sizing:border-box;padding:22px 24px;text-align:left;cursor:pointer;color:#f3f0ff;border-radius:22px;background:' + (selected ? '#241c52' : '#ffffff') + ';border:2px solid ' + (selected ? '#5b3df5' : '#2a2360') + ';',
-pick: () => this.setState({ sel: p.id }),
-pillLabel: isMet ? 'You\'ve met' : 'Could meet',
-pillStyle: 'display:flex;align-items:center;align-self:flex-start;height:34px;padding:0 16px;border-radius:999px;font-size:14px;font-weight:600;' + (isMet ? 'background:#3d3210;color:#ffd86b;' : 'background:#0d3d3a;color:#4be3c6;'),
-mutual: p.mutual.map((n) => ({ name: n })),
-acted: acted,
-actLabel: isMet ? (acted ? 'Follow-up added' : 'Add follow-up') : (acted ? 'Added to prep' : 'Add to prep'),
-actStyle: 'flex-shrink:0;min-height:52px;padding:0 26px;border-radius:999px;font-size:16px;font-weight:700;cursor:pointer;' + (acted ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;'),
-toggleAct: () => this.setState({ acted: { ...st.acted, [p.id]: !acted } })
+style: 'position:absolute;left:' + U(p.x - 100) + ';top:' + U(p.y - 42) + ';width:' + U(200) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(4) + ';padding:0;border:0;background:transparent;color:#f3f0ff;cursor:pointer;text-align:center;opacity:' + (dim ? 0.28 : 1) + ';' + (intro ? 'animation:nm-pop .6s cubic-bezier(.2,.8,.2,1) ' + (300 + i * 80) + 'ms both;' : ''),
+avStyle: 'display:flex;align-items:center;justify-content:center;width:' + U(84) + ';height:' + U(84) + ';margin-bottom:' + U(8) + ';border-radius:999px;font-size:' + U(26) + ';font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';' + (selected ? 'transform:scale(1.1);animation:nm-selpulse 1.6s ease-out infinite;' : 'box-shadow:0 0 0 4px #100c30,0 0 0 6px ' + tone.bg + '66,0 18px 40px -16px rgba(0,0,0,.8);'),
+pillStyle: 'display:flex;align-items:center;height:' + U(26) + ';margin-top:' + U(4) + ';padding:0 ' + U(12) + ';border-radius:999px;font-size:' + U(12) + ';font-weight:700;' + pillTones[p.pillKind],
+pick: () => go({ sel: selected ? null : p.id, relens: false })
+};
+});
+const events = eventData.map((e, i) => {
+const selected = sel === e.id;
+const dim = sel && !selected && !linkedTo(e.id);
+return {
+title: e.title, meta: e.meta, tag: e.tag,
+selected: selected,
+style: 'position:absolute;left:' + U(e.x - 150) + ';top:' + U(e.y - 46) + ';width:' + U(300) + ';box-sizing:border-box;display:flex;flex-direction:column;gap:' + U(5) + ';padding:' + U(14) + ' ' + U(16) + ';border-radius:' + U(20) + ';background:#161141;border:1px solid ' + (selected ? '#ffc93c' : '#2c2360') + ';color:#f3f0ff;cursor:pointer;opacity:' + (dim ? 0.28 : 1) + ';box-shadow:' + (selected ? '0 0 0 4px rgba(255,201,60,.3),0 24px 48px -16px rgba(255,201,60,.4)' : '0 24px 48px -20px rgba(0,0,0,.8)') + ';' + (intro ? 'animation:nm-pop .6s cubic-bezier(.2,.8,.2,1) ' + (800 + i * 120) + 'ms both;' : ''),
+pick: () => go({ sel: selected ? null : e.id, relens: false })
+};
+});
+const chips = chipData.map((c, i) => {
+const dim = sel && sel !== c.who;
+const pos = c.side === 'l' ? 'right:' + U(W - 190) + ';' : 'left:' + U(872) + ';';
+const bob = 'nm-bob ' + (3.6 + (i % 4) * 0.5).toFixed(1) + 's ease-in-out ' + (-(i * 0.7)).toFixed(1) + 's infinite alternate';
+return {
+text: c.text,
+style: 'position:absolute;' + pos + 'top:' + U(c.y) + ';display:flex;align-items:center;height:' + U(32) + ';padding:0 ' + U(14) + ';border-radius:999px;background:#2e2470;border:1px solid #3a3080;color:#d3c9ff;font-size:' + U(13) + ';font-weight:600;white-space:nowrap;opacity:' + (dim ? 0.18 : 1) + ';animation:' + (intro ? 'nm-rise .5s ease ' + (1000 + i * 45) + 'ms both,' : '') + bob + ';'
+};
+});
+
+// ---------- Camera ----------
+let worldStyle = 'position:absolute;inset:0;transform-origin:0 0;--tx:0px;--ty:0px;--s:1;transform:translate(0px,0px) scale(1);';
+if (sel) {
+const s = 0.86;
+const P = byId[sel];
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const tx = clamp(290 - s * P.x, 562 - W * s, 0);
+const ty = clamp((H / 2) - s * P.y, 0, H - H * s);
+worldStyle = 'position:absolute;inset:0;transform-origin:0 0;--tx:' + U(tx) + ';--ty:' + U(ty) + ';--s:' + s + ';transform:translate(' + U(tx) + ',' + U(ty) + ') scale(' + s + ');animation:nm-zoom .7s cubic-bezier(.2,.8,.2,1) both;';
+}
+const meDim = sel && !linkedTo('me');
+const meStyle = 'position:absolute;left:' + U(CX - 160) + ';top:' + U(CY - 58) + ';width:' + U(320) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(4) + ';text-align:center;pointer-events:none;opacity:' + (meDim ? 0.35 : 1) + ';' + (intro ? 'animation:nm-pop .7s cubic-bezier(.2,.8,.2,1) both;' : '');
+const goalStyle = 'display:' + (st.lens === 'goal' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:' + U(8) + ';margin-top:' + U(10) + ';';
+const veilStyle = 'position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(13,10,36,0) 40%,rgba(13,10,36,.55) 100%);transition:opacity .5s ease;opacity:' + (sel ? 1 : 0) + ';';
+
+// ---------- Panels ----------
+const selPerson = peopleData.filter((p) => p.id === sel)[0];
+const selEvent = eventData.filter((e) => e.id === sel)[0];
+const shapePerson = (p) => {
+const tone = tones[p.tone];
+const done = !!st.done[p.id];
+const statusTone = p.status === 'Suggested' ? 'background:#0d3d3a;color:#4be3c6;' : 'background:#173d2a;color:#5fe3a0;';
+return {
+name: p.name, role: p.role, status: p.status, calLabel: p.calLabel, whyTitle: p.whyTitle, why: p.why,
+initials: initials(p.name),
+bigAvStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:76px;height:76px;border-radius:999px;font-size:26px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
+statusStyle: 'display:flex;align-items:center;flex-shrink:0;height:30px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;' + statusTone,
+common: p.common.map((t) => ({ text: t })),
+bring: p.bring.map((t) => ({ text: t })),
+learn: p.learn.map((t) => ({ text: t })),
+questions: p.questions.map((t, i) => ({ n: String(i + 1), text: t })),
+done: done,
+doneLabel: done ? 'Completed' : 'Mark as completed',
+doneStyle: 'height:50px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (done ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#f3f0ff;color:#1a1440;border:2px solid #f3f0ff;'),
+toggleDone: () => go({ done: { ...st.done, [p.id]: !done } })
 };
 };
-const people = all.filter((p) => p.group === st.tab).map(shaped);
-const sel = shaped(all.filter((p) => p.id === st.sel)[0] || all[0]);
-return { tabs: tabs, people: people, sel: sel };
+const shapeEvent = (e) => {
+const added = !!st.added[e.id];
+return {
+title: e.title, tag: e.tag, metaLong: e.metaLong, why: e.why,
+who: e.who.map((id) => {
+const q = peopleData.filter((p) => p.id === id)[0];
+const tone = tones[q.tone];
+return {
+name: q.name, note: e.whoNotes[id], initials: initials(q.name),
+avStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;border-radius:999px;font-size:14px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
+pick: () => go({ sel: id, relens: false })
+};
+}),
+steps: e.steps.map((t, i) => ({ n: String(i + 1), text: t })),
+added: added,
+addLabel: added ? 'On your plan' : 'Add to plan',
+addStyle: 'height:50px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (added ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#f3f0ff;color:#1a1440;border:2px solid #f3f0ff;'),
+toggleAdd: () => go({ added: { ...st.added, [e.id]: !added } })
+};
+};
+
+return {
+hint: lens.hint,
+lenses: lenses,
+glowStyle: glowStyle,
+sweepStyle: sweepStyle,
+ringOuter: ringOuter,
+ringInner: ringInner,
+edges: edges,
+chips: chips,
+events: events,
+people: people,
+meStyle: meStyle,
+goalStyle: goalStyle,
+worldStyle: worldStyle,
+veilStyle: veilStyle,
+showPerson: !!selPerson,
+showEvent: !!selEvent,
+p: shapePerson(selPerson || peopleData[0]),
+ev: shapeEvent(selEvent || eventData[0]),
+back: () => go({ sel: null, relens: false })
+};
 }
 }
 </script>
