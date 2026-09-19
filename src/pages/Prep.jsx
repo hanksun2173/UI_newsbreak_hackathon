@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Shell from '../components/Shell.jsx';
 import { c, serif, eyebrow } from '../theme.js';
+import { loadGoal } from '../goal.js';
 
 const PREPS = {
   person: {
@@ -70,6 +71,7 @@ const kindPillStyle = (id) => ({
 const sectionLabel = { ...eyebrow };
 
 export default function Prep() {
+  const saved = loadGoal();
   const navigate = useNavigate();
   const [kind, setKind] = useState('person');
   const [loading, setLoading] = useState(false);
@@ -114,7 +116,7 @@ export default function Prep() {
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.85 }}>
               Primary goal
             </div>
-            <div style={{ fontFamily: serif, fontSize: 28, lineHeight: 1.15 }}>Find an AI B2B PM internship</div>
+            <div style={{ fontFamily: serif, fontSize: 28, lineHeight: 1.15 }}>{saved?.goal || 'Find an AI B2B PM internship'}</div>
           </div>
           <div
             style={{
@@ -128,7 +130,7 @@ export default function Prep() {
             }}
           >
             <div style={eyebrow}>Secondary interest</div>
-            <div style={{ fontFamily: serif, fontSize: 28, lineHeight: 1.15 }}>Explore the Physical AI industry</div>
+            <div style={{ fontFamily: serif, fontSize: 28, lineHeight: 1.15 }}>{saved?.secondary || 'Explore the Physical AI industry'}</div>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 28 }}>

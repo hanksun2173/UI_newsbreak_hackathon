@@ -8,11 +8,18 @@ import People from './pages/People.jsx';
 import FollowUps from './pages/FollowUps.jsx';
 import GoalSetup from './pages/GoalSetup.jsx';
 import Prep from './pages/Prep.jsx';
+import { hasGoal } from './goal.js';
+
+// First visit lands on Goal setup; once a plan has been built, `/` is Home.
+function Entry() {
+  return hasGoal() ? <Home /> : <GoalSetup />;
+}
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
+      <Route path="/" element={<Entry />} />
+      <Route path="/landing" element={<Landing />} />
       <Route path="/home" element={<Home />} />
       <Route path="/schedule" element={<Schedule />} />
       <Route path="/plan" element={<Plan />} />

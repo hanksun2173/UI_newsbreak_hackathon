@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { c, serif, sans } from '../theme.js';
+import { loadGoal, saveGoal } from '../goal.js';
 
 const STEPS = [
   {
@@ -26,7 +27,9 @@ const fieldBase = {
   width: '100%',
   boxSizing: 'border-box',
   borderRadius: 16,
-  border: `2px solid ${c.lineStrong}`,
+  borderWidth: 2,
+  borderStyle: 'solid',
+  borderColor: c.lineStrong,
   background: c.bg,
   color: c.text,
   fontSize: 16,
@@ -47,11 +50,12 @@ export default function GoalSetup() {
   const [statusIndex, setStatusIndex] = useState(0);
   const timers = useRef({ tick: null, done: null });
 
+  const saved = loadGoal();
   const [background, setBackground] = useState(
-    'B2B SaaS PM with experience in enterprise products, MarTech, customer discovery and GTM.'
+    saved?.background ?? 'B2B SaaS PM with experience in enterprise products, MarTech, customer discovery and GTM.'
   );
-  const [goal, setGoal] = useState('Find an AI B2B PM internship');
-  const [secondary, setSecondary] = useState('Explore the Physical AI industry');
+  const [goal, setGoal] = useState(saved?.goal ?? 'Find an AI B2B PM internship');
+  const [secondary, setSecondary] = useState(saved?.secondary ?? 'Explore the Physical AI industry');
 
   const bgFocus = useFocusBorder();
   const goalFocus = useFocusBorder();
@@ -69,6 +73,7 @@ export default function GoalSetup() {
     if (building) return;
     setBuilding(true);
     setStatusIndex(0);
+    saveGoal({ background, goal, secondary });
     let i = 0;
     timers.current.tick = setInterval(() => {
       i += 1;

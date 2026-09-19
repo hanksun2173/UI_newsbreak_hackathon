@@ -17,7 +17,8 @@ Then open the URL Vite prints (http://localhost:5173 by default).
 
 | Path           | Screen                        |
 | -------------- | ----------------------------- |
-| `/`            | Landing page                  |
+| `/`            | Goal setup on first run, then Home |
+| `/landing`     | Marketing landing page        |
 | `/home`        | Home                          |
 | `/schedule`    | Schedule (week view)          |
 | `/plan`        | Proposed plan                 |
