@@ -1,4 +1,4 @@
-# Networking Companion
+# Minerva
 
 React prototype of the networking companion UI: a landing page plus the app
 screens (Home, Schedule, Plan, Events, People map, Follow-ups, Goal setup and

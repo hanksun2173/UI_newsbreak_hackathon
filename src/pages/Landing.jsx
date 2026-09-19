@@ -91,7 +91,7 @@ export default function Landing() {
     >
       {/* NAV */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '28px 80px' }}>
-        <div style={{ fontFamily: serif, fontSize: 28, letterSpacing: '-0.01em' }}>[Product name]</div>
+        <div style={{ fontFamily: serif, fontSize: 28, letterSpacing: '-0.01em' }}>Minerva</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 40, fontSize: 16 }}>
           <a href="#journey" style={{ color: ink, textDecoration: 'none' }}>How it works</a>
           <a href="#not-crm" style={{ color: ink, textDecoration: 'none' }}>Why it's different</a>
@@ -357,7 +357,7 @@ export default function Landing() {
           color: body,
         }}
       >
-        <div style={{ fontFamily: serif, fontSize: 22, color: ink }}>[Product name]</div>
+        <div style={{ fontFamily: serif, fontSize: 22, color: ink }}>Minerva</div>
         <div>© [YEAR] [Company name]</div>
       </div>
     </div>

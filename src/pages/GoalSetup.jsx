@@ -108,7 +108,7 @@ export default function GoalSetup() {
           borderBottom: `1px solid ${c.line}`,
         }}
       >
-        <div style={{ fontFamily: serif, fontSize: 30, letterSpacing: '-0.01em', color: '#ffffff' }}>[Product name]</div>
+        <div style={{ fontFamily: serif, fontSize: 30, letterSpacing: '-0.01em', color: '#ffffff' }}>Minerva</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ fontSize: 16, fontWeight: 600, color: '#ffffff' }}>Alex</div>
           <div

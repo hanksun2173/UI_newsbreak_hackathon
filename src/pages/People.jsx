@@ -987,7 +987,7 @@ export default function People() {
                   </div>
                 </div>
                 <div style={{ fontSize: U(20), fontWeight: 700 }}>Hank (you)</div>
-                <div style={{ fontSize: U(14), color: c.textMuted }}>Founder · [Product name]</div>
+                <div style={{ fontSize: U(14), color: c.textMuted }}>Founder · Minerva</div>
                 <div style={goalStyle}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: U(8), height: U(38), padding: `0 ${U(18)}`, borderRadius: 999, background: c.yellowDeep, border: '1px solid #7a6420', color: c.yellowSoft, fontSize: U(15), fontWeight: 700, whiteSpace: 'nowrap' }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd86b" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" style={{ width: U(16), height: U(16) }}>

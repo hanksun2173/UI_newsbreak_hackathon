@@ -44,7 +44,7 @@ export default function Sidebar({ user = 'Hank', activePath, sticky = true, hide
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
         <div style={{ padding: '0 14px', fontFamily: serif, fontSize: 30, letterSpacing: '-0.01em', color: '#ffffff' }}>
-          [Product name]
+          Minerva
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 17 }}>
           {NAV.filter((n) => !hide.includes(n.to)).map((n) => (
