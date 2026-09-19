@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Plan</title>
     <script src="./support.js"></script>
+    <script src="./store.js"></script>
   </head>
   <body>
     <x-dc>
@@ -25,20 +26,36 @@
           a:hover {
             color: #d3c9ff;
           }
-          button {
+          button,input,select {
             font-family: inherit;
+          }
+          input,select {
+            box-sizing: border-box;
+            height: 46px;
+            padding: 0 14px;
+            border-radius: 14px;
+            border: 2px solid #3a3080;
+            background: #0f0b2e;
+            color: #f3f0ff;
+            font-size: 15px;
+          }
+          input:focus,select:focus {
+            outline: 0;
+            border-color: #5b3df5;
+          }
+          input::placeholder {
+            color: #6f6a99;
           }
         </style>
       </helmet>
       <div
         style="width: 1440px;
-          min-height: 1600px;
+          min-height: 1000px;
           box-sizing: border-box;
           display: flex;
           background: #0d0a24;
           color: #f3f0ff;
           font-family: 'Hanken Grotesk', system-ui, sans-serif;">
-
         <!-- SIDEBAR -->
         <div
           style="width: 250px;
@@ -94,16 +111,6 @@
                   text-decoration: none;
                   font-weight: 700;">Plan</a>
               <a
-                href="Events.dc.html"
-                style="display: flex;
-                  align-items: center;
-                  min-height: 48px;
-                  padding: 0 14px;
-                  border-radius: 14px;
-                  color: #e4defc;
-                  text-decoration: none;
-                  font-weight: 500;">Events</a>
-              <a
                 href="People.dc.html"
                 style="display: flex;
                   align-items: center;
@@ -112,7 +119,7 @@
                   border-radius: 14px;
                   color: #e4defc;
                   text-decoration: none;
-                  font-weight: 500;">People</a>
+                  font-weight: 500;">Map</a>
               <a
                 href="FollowUps.dc.html"
                 style="display: flex;
@@ -144,21 +151,80 @@
         <!-- MAIN -->
         <div
           style="flex-grow: 1;
+            min-width: 0;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 44px;
+            gap: 36px;
             padding: 56px 64px 64px 64px;">
 
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <h1
-              style="margin: 0;
-                font-family: 'Instrument Serif', Georgia, serif;
-                font-weight: 400;
-                font-size: 56px;
-                line-height: 1;
-                letter-spacing: -0.02em;">Proposed plan</h1>
-            <div style="font-size: 19px; color: #a9a3cf;">Sep 19 to 26.</div>
+          <!-- Header -->
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <h1
+                style="margin: 0;
+                  font-family: 'Instrument Serif', Georgia, serif;
+                  font-weight: 400;
+                  font-size: 56px;
+                  line-height: 1;
+                  letter-spacing: -0.02em;">Proposed plan</h1>
+              <div
+                style="font-size: 19px; color: #a9a3cf;">Mon Sep 21 – Fri Sep 25 · every change here lands on your schedule.</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+              <a
+                href="GoalSetup.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  min-height: 52px;
+                  padding: 0 22px;
+                  border-radius: 999px;
+                  background: #161141;
+                  border: 2px solid #3a3080;
+                  color: #cfc6ff;
+                  font-size: 16px;
+                  font-weight: 700;
+                  text-decoration: none;">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+                Goals
+              </a>
+              <a
+                href="Schedule.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  min-height: 52px;
+                  padding: 0 24px;
+                  border-radius: 999px;
+                  background: #5b3df5;
+                  border: 2px solid #5b3df5;
+                  color: #ffffff;
+                  font-size: 16px;
+                  font-weight: 700;
+                  text-decoration: none;">
+                Open schedule
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+              </a>
+            </div>
           </div>
 
           <div
@@ -172,13 +238,13 @@
               style="grid-column: span 8;
                 display: flex;
                 flex-direction: column;
-                gap: 40px;
+                gap: 32px;
                 padding: 40px;
                 background: #161141;
                 border: 1px solid #2c2360;
                 border-radius: 28px;">
-              <sc-for list="{{ days }}" as="day" hint-placeholder-count="4">
-                <div style="display: flex; align-items: flex-start; gap: 28px;">
+              <sc-for list="{{ days }}" as="day" hint-placeholder-count="5">
+                <div style="{{ day.rowStyle }}">
                   <div style="{{ day.chipStyle }}">
                     <div
                       style="font-size: 12px;
@@ -190,13 +256,24 @@
                         font-size: 32px;
                         line-height: 1;">{{ day.date }}</div>
                   </div>
-                  <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px;">
-                    <sc-for list="{{ day.items }}" as="it" hint-placeholder-count="1">
+                  <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
+                    <sc-if value="{{ day.isEmpty }}" hint-placeholder-val="{{ false }}">
+                      <div
+                        style="display: flex;
+                          align-items: center;
+                          min-height: 72px;
+                          padding: 0 26px;
+                          border-radius: 20px;
+                          border: 1px dashed #3a3080;
+                          font-size: 16px;
+                          color: #6f6a99;">Nothing planned. Add something on the right.</div>
+                    </sc-if>
+                    <sc-for list="{{ day.items }}" as="it" hint-placeholder-count="2">
                       <div style="{{ it.cardStyle }}">
-                        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px;">
-                          <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+                          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                             <div style="{{ it.pillStyle }}">{{ it.kindLabel }}</div>
-                            <sc-if value="{{ it.isNew }}" hint-placeholder-val="{{ false }}">
+                            <sc-if value="{{ it.added }}" hint-placeholder-val="{{ false }}">
                               <div
                                 style="display: flex;
                                   align-items: center;
@@ -206,18 +283,45 @@
                                   background: #3d3210;
                                   color: #ffd86b;
                                   font-size: 14px;
-                                  font-weight: 600;">New idea</div>
+                                  font-weight: 600;">Added by you</div>
                             </sc-if>
                             <div style="font-size: 15px; color: #a9a3cf;">{{ it.time }}</div>
                           </div>
                           <div style="{{ it.titleStyle }}">{{ it.title }}</div>
                           <div style="font-size: 15px; line-height: 1.55; color: #a9a3cf;">{{ it.why }}</div>
                         </div>
-                        <button
-                          type="button"
-                          onClick="{{ it.toggle }}"
-                          aria-pressed="{{ it.skipped }}"
-                          style="{{ it.btnStyle }}">{{ it.btnLabel }}</button>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+                          <button
+                            type="button"
+                            onClick="{{ it.toggle }}"
+                            aria-pressed="{{ it.skipped }}"
+                            style="{{ it.btnStyle }}">{{ it.btnLabel }}</button>
+                          <button
+                            type="button"
+                            onClick="{{ it.remove }}"
+                            aria-label="{{ it.removeLabel }}"
+                            style="display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              width: 44px;
+                              height: 44px;
+                              border-radius: 999px;
+                              background: #161141;
+                              border: 2px solid #3a3080;
+                              color: #ff8d84;
+                              cursor: pointer;">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+                          </button>
+                        </div>
                       </div>
                     </sc-for>
                   </div>
@@ -225,144 +329,336 @@
               </sc-for>
             </div>
 
-            <!-- Summary -->
-            <div
-              style="grid-column: span 4;
-                display: flex;
-                flex-direction: column;
-                gap: 28px;
-                padding: 36px;
-                background: #241c52;
-                border: 1px solid #3a3080;
-                border-radius: 28px;">
-              <div style="display: flex; align-items: center; gap: 14px;">
-                <div style="width: 14px; height: 14px; border-radius: 999px; background: #ffc93c;"></div>
-                <h2
-                  style="margin: 0;
-                    font-family: 'Instrument Serif', Georgia, serif;
-                    font-weight: 400;
-                    font-size: 30px;
-                    letter-spacing: -0.01em;">This plan</h2>
-              </div>
-              <div style="display: flex; flex-direction: column;">
-                <div
-                  style="display: flex;
-                    align-items: baseline;
-                    gap: 18px;
-                    padding: 20px 0;
-                    border-top: 1px solid #3a3080;">
-                  <div
-                    style="width: 64px;
-                      font-family: 'Instrument Serif', Georgia, serif;
-                      font-size: 56px;
-                      line-height: 1;
-                      color: #b7a7ff;">{{ eventCount }}</div>
-                  <div style="font-size: 17px; font-weight: 600;">Events and meetings</div>
-                </div>
-                <div
-                  style="display: flex;
-                    align-items: baseline;
-                    gap: 18px;
-                    padding: 20px 0;
-                    border-top: 1px solid #3a3080;">
-                  <div
-                    style="width: 64px;
-                      font-family: 'Instrument Serif', Georgia, serif;
-                      font-size: 56px;
-                      line-height: 1;
-                      color: #4be3c6;">{{ peopleCount }}</div>
-                  <div style="font-size: 17px; font-weight: 600;">People you'll see</div>
-                </div>
-                <div
-                  style="display: flex;
-                    align-items: baseline;
-                    gap: 18px;
-                    padding: 20px 0;
-                    border-top: 1px solid #3a3080;">
-                  <div
-                    style="width: 64px;
-                      font-family: 'Instrument Serif', Georgia, serif;
-                      font-size: 56px;
-                      line-height: 1;
-                      color: #ff8d84;">{{ followCount }}</div>
-                  <div style="font-size: 17px; font-weight: 600;">Follow-ups to send</div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick="{{ approve }}"
-                aria-pressed="{{ approved }}"
-                style="{{ approveStyle }}">{{ approveLabel }}</button>
-              <div style="font-size: 15px; line-height: 1.55; color: #a9a3cf;">{{ approveNote }}</div>
-            </div>
+            <!-- Right column -->
+            <div style="grid-column: span 4; display: flex; flex-direction: column; gap: 24px;">
 
+              <!-- Add to plan -->
+              <div
+                style="display: flex;
+                  flex-direction: column;
+                  gap: 18px;
+                  padding: 32px;
+                  background: #241c52;
+                  border: 1px solid #3a3080;
+                  border-radius: 28px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 14px; height: 14px; border-radius: 999px; background: #14c8a8;"></div>
+                  <h2
+                    style="margin: 0;
+                      font-family: 'Instrument Serif', Georgia, serif;
+                      font-weight: 400;
+                      font-size: 30px;
+                      letter-spacing: -0.01em;">Add to plan</h2>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label
+                    for="f-title"
+                    style="font-size: 13px;
+                      font-weight: 700;
+                      letter-spacing: 0.1em;
+                      text-transform: uppercase;
+                      color: #8e88b8;">What</label>
+                  <input id="f-title" type="text" placeholder="Coffee with someone new">
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label
+                      for="f-kind"
+                      style="font-size: 13px;
+                        font-weight: 700;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: #8e88b8;">Type</label>
+                    <select id="f-kind">
+                      <option value="event">Event</option>
+                      <option value="meeting">Coffee chat</option>
+                      <option value="follow">Follow-up</option>
+                    </select>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label
+                      for="f-day"
+                      style="font-size: 13px;
+                        font-weight: 700;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: #8e88b8;">Day</label>
+                    <select id="f-day">
+                      <sc-for list="{{ dayOptions }}" as="o" hint-placeholder-count="5">
+                        <option value="{{ o.value }}">{{ o.label }}</option>
+                      </sc-for>
+                    </select>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label
+                      for="f-start"
+                      style="font-size: 13px;
+                        font-weight: 700;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: #8e88b8;">Starts</label>
+                    <select id="f-start">
+                      <sc-for list="{{ startOptions }}" as="o" hint-placeholder-count="8">
+                        <option value="{{ o.value }}">{{ o.label }}</option>
+                      </sc-for>
+                    </select>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label
+                      for="f-length"
+                      style="font-size: 13px;
+                        font-weight: 700;
+                        letter-spacing: 0.1em;
+                        text-transform: uppercase;
+                        color: #8e88b8;">Length</label>
+                    <select id="f-length">
+                      <option value="0.5">30 min</option>
+                      <option value="0.75">45 min</option>
+                      <option value="1" selected>1 hour</option>
+                      <option value="1.5">90 min</option>
+                      <option value="2">2 hours</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <label
+                    for="f-where"
+                    style="font-size: 13px;
+                      font-weight: 700;
+                      letter-spacing: 0.1em;
+                      text-transform: uppercase;
+                      color: #8e88b8;">Where</label>
+                  <input id="f-where" type="text" placeholder="Corner Café">
+                </div>
+
+                <button
+                  type="button"
+                  onClick="{{ add }}"
+                  style="min-height: 52px;
+                    border-radius: 999px;
+                    background: #14c8a8;
+                    border: 2px solid #14c8a8;
+                    color: #06251f;
+                    font-size: 16px;
+                    font-weight: 700;
+                    cursor: pointer;">Add to plan</button>
+                <div style="{{ noteStyle }}">{{ note }}</div>
+              </div>
+
+              <!-- Summary -->
+              <div
+                style="display: flex;
+                  flex-direction: column;
+                  gap: 24px;
+                  padding: 32px;
+                  background: #241c52;
+                  border: 1px solid #3a3080;
+                  border-radius: 28px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="width: 14px; height: 14px; border-radius: 999px; background: #ffc93c;"></div>
+                  <h2
+                    style="margin: 0;
+                      font-family: 'Instrument Serif', Georgia, serif;
+                      font-weight: 400;
+                      font-size: 30px;
+                      letter-spacing: -0.01em;">This plan</h2>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                  <div
+                    style="display: flex;
+                      align-items: baseline;
+                      gap: 18px;
+                      padding: 18px 0;
+                      border-top: 1px solid #3a3080;">
+                    <div
+                      style="width: 64px;
+                        font-family: 'Instrument Serif', Georgia, serif;
+                        font-size: 52px;
+                        line-height: 1;
+                        color: #b7a7ff;">{{ eventCount }}</div>
+                    <div style="font-size: 17px; font-weight: 600;">On your schedule</div>
+                  </div>
+                  <div
+                    style="display: flex;
+                      align-items: baseline;
+                      gap: 18px;
+                      padding: 18px 0;
+                      border-top: 1px solid #3a3080;">
+                    <div
+                      style="width: 64px;
+                        font-family: 'Instrument Serif', Georgia, serif;
+                        font-size: 52px;
+                        line-height: 1;
+                        color: #4be3c6;">{{ peopleCount }}</div>
+                    <div style="font-size: 17px; font-weight: 600;">People you'll see</div>
+                  </div>
+                  <div
+                    style="display: flex;
+                      align-items: baseline;
+                      gap: 18px;
+                      padding: 18px 0;
+                      border-top: 1px solid #3a3080;">
+                    <div
+                      style="width: 64px;
+                        font-family: 'Instrument Serif', Georgia, serif;
+                        font-size: 52px;
+                        line-height: 1;
+                        color: #ff8d84;">{{ followCount }}</div>
+                    <div style="font-size: 17px; font-weight: 600;">Follow-ups to send</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick="{{ approve }}"
+                  aria-pressed="{{ approved }}"
+                  style="{{ approveStyle }}">{{ approveLabel }}</button>
+                <div style="font-size: 15px; line-height: 1.55; color: #a9a3cf;">{{ approveNote }}</div>
+                <button
+                  type="button"
+                  onClick="{{ reset }}"
+                  style="align-self: flex-start;
+                    padding: 0;
+                    background: none;
+                    border: 0;
+                    color: #8e88b8;
+                    font-size: 14px;
+                    text-decoration: underline;
+                    cursor: pointer;">Reset to the companion's plan</button>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
     </x-dc>
-    <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1600}}'>
+    <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
       class Component extends DCLogic {
         constructor(props) {
           super(props);
-          this.state = { skipped: {}, approved: false };
+          this.state = { approved: false, note: '', noteKind: 'quiet' };
+          // Another tab edited the plan: redraw with what it wrote.
+          PlanStore.subscribe(() => this.setState({}));
         }
+
+        // Reads the add form. The form keeps its own text until it is submitted, so a
+        // re-render never interrupts typing.
+        readForm() {
+          const val = (id) => {
+            const el = document.getElementById(id);
+            return el ? el.value.trim() : '';
+          };
+          return { title: val('f-title'), kind: val('f-kind'), d: parseInt(val('f-day'), 10), start: parseFloat(val('f-start')), length: parseFloat(val('f-length')), where: val('f-where') };
+        }
+
         renderVals() {
           const st = this.state;
+          const items = PlanStore.load();
           const kinds = {
-            event: { label: 'Event', pill: 'background:#2e2470;color:#b7a7ff;' },
-            meeting: { label: 'Coffee', pill: 'background:#0d3d3a;color:#4be3c6;' },
-            follow: { label: 'Follow-up', pill: 'background:#4a1d1f;color:#ff8d84;' }
+            event: { label: 'Event', pill: 'background:#0f5c51;color:#4be3c6;' },
+            meeting: { label: 'Coffee chat', pill: 'background:#4a1d1f;color:#ff8d84;' },
+            follow: { label: 'Follow-up', pill: 'background:#2e2470;color:#b7a7ff;' }
           };
-          const all = [
-            { id: 'p1', day: 'Sat', date: '19', kind: 'follow', time: 'Today · about 10 min', title: 'Send Priya the article on onboarding tools', why: 'You are still fresh from Demo Night, and you will see Priya again on Tuesday.', who: ['Priya Nair'] },
-            { id: 'p2', day: 'Mon', date: '21', kind: 'follow', time: 'About 15 min', title: 'Introduce Daniel to Sofia', why: 'You promised Marcus, and Daniel speaks on Saturday, so an early introduction helps.', who: ['Daniel Okafor', 'Sofia Lindqvist'] },
-            { id: 'p3', day: 'Tue', date: '22', kind: 'event', time: '6:30 pm', title: 'Founders & Friends Meetup', why: 'Your evening is free, and three people you know are going.', who: ['Priya Nair', 'Ana Ruiz', 'Maya Chen'] },
-            { id: 'p4', day: 'Wed', date: '23', kind: 'follow', time: 'Due Wed · about 10 min', title: 'Share the deck with Ana', why: 'She asked for it at the last meetup, and you will have just seen her.', who: ['Ana Ruiz'] },
-            { id: 'p5', day: 'Wed', date: '23', kind: 'follow', time: 'About 5 min', title: 'Send Maya a note before Thursday', why: 'A short hello makes your first coffee feel less like a cold start.', who: ['Maya Chen'] },
-            { id: 'p6', day: 'Thu', date: '24', kind: 'meeting', time: '3:30 pm · Corner Café', title: 'Coffee with Maya Chen', why: 'You both care about onboarding and organize local meetups.', who: ['Maya Chen'] },
-            { id: 'p7', day: 'Sat', date: '26', kind: 'event', time: '10:00 am', title: 'Climate Tech Demo Morning', why: 'Three demoing teams match your saved interests, and Daniel Okafor is speaking.', who: ['Daniel Okafor'] },
-            { id: 'p8', day: 'Sat', date: '26', kind: 'meeting', time: '11:30 am', title: 'Ask Daniel for 20 minutes after his talk', why: 'With the introduction behind you, this can be a real conversation.', who: ['Daniel Okafor'], isNew: true }
-          ];
+
           const shaped = (p) => {
-            const skipped = !!st.skipped[p.id];
-            const k = kinds[p.kind];
+            const skipped = !!p.skipped;
+            const k = kinds[p.kind] || kinds.event;
+            const time = p.start != null
+            ? PlanStore.range(p.start, p.end) + (p.where ? ' · ' + p.where : '')
+            : (p.effort || 'about 10 min');
             return {
-              ...p,
+              title: p.title,
+              why: p.why || 'Added by you.',
+              time: time,
               skipped: skipped,
-              isNew: !!p.isNew,
+              added: !!p.added,
               kindLabel: k.label,
               pillStyle: 'display:flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:600;' + k.pill,
-              cardStyle: 'display:flex;align-items:flex-start;gap:24px;padding:24px 26px;border-radius:20px;background:#241c52;border:1px solid #3a3080;' + (skipped ? 'opacity:0.55;' : ''),
-              titleStyle: 'font-size:21px;font-weight:700;line-height:1.3;' + (skipped ? 'text-decoration:line-through;' : ''),
+              cardStyle: 'display:flex;align-items:flex-start;gap:20px;padding:22px 24px;border-radius:20px;background:#241c52;border:1px solid #3a3080;' + (skipped ? 'opacity:0.5;' : ''),
+              titleStyle: 'font-size:20px;font-weight:700;line-height:1.3;' + (skipped ? 'text-decoration:line-through;' : ''),
               btnLabel: skipped ? 'Restore' : 'Skip',
               btnStyle: 'flex-shrink:0;min-height:44px;padding:0 20px;border-radius:999px;font-size:15px;font-weight:600;cursor:pointer;background:#161141;color:#b7a7ff;border:2px solid ' + (skipped ? '#14c8a8' : '#3a3080') + ';',
-              toggle: () => this.setState({ skipped: { ...st.skipped, [p.id]: !skipped }, approved: false })
+              removeLabel: 'Remove ' + p.title,
+              toggle: () => {
+                PlanStore.update(p.id, { skipped: !skipped });
+                this.setState({ approved: false, noteKind: 'quiet', note: skipped ? 'Back on your schedule.' : 'Skipped, and off your schedule.' });
+              },
+              remove: () => {
+                PlanStore.remove(p.id);
+                this.setState({ approved: false, noteKind: 'warn', note: 'Removed from the plan and the schedule.' });
+              }
             };
           };
-          const order = ['19', '21', '22', '23', '24', '26'];
-          const days = order.map((d) => {
-            const items = all.filter((p) => p.date === d);
+
+          const days = PlanStore.DAYS.map((d) => {
+            const mine = items.filter((p) => p.d === d.d);
             return {
-              day: items[0].day,
-              date: d,
-              chipStyle: 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:72px;height:72px;flex-shrink:0;border-radius:20px;' + (d === '19' ? 'background:#ff5a4e;color:#1a1440;' : 'background:#5b3df5;color:#ffffff;'),
-              items: items.map(shaped)
+              day: d.day,
+              date: d.date,
+              isEmpty: mine.length === 0,
+              rowStyle: 'display:flex;align-items:flex-start;gap:26px;' + (d.past ? 'opacity:0.55;' : ''),
+              chipStyle: 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:72px;height:72px;flex-shrink:0;border-radius:20px;' + (d.today ? 'background:#5b3df5;color:#ffffff;' : 'background:#2a2660;color:#d6d2ee;'),
+              items: mine.map(shaped)
             };
           });
-          const kept = all.filter((p) => !st.skipped[p.id]);
+
+          const kept = items.filter((p) => !p.skipped);
           const people = {};
-          kept.forEach((p) => p.who.forEach((n) => { people[n] = true; }));
+          kept.forEach((p) => (p.who || []).forEach((n) => { people[n] = true; }));
+
+          const startOptions = [];
+          for (let t = 9; t <= 16.5; t += 0.5) {
+            startOptions.push({ value: String(t), label: PlanStore.clock(t) });
+          }
+
           const approved = st.approved;
           return {
             days: days,
             eventCount: kept.filter((p) => p.kind !== 'follow').length,
             followCount: kept.filter((p) => p.kind === 'follow').length,
             peopleCount: Object.keys(people).length,
+            dayOptions: PlanStore.DAYS.map((d) => ({ value: String(d.d), label: d.day + ' ' + d.date })),
+            startOptions: startOptions,
+            note: st.note || 'A follow-up has no time, so it stays here rather than on the grid.',
+            noteStyle: 'font-size:14px;line-height:1.5;color:' + (st.noteKind === 'warn' ? '#ff8d84' : '#a9a3cf') + ';',
             approved: approved,
             approveLabel: approved ? 'Plan approved' : 'Approve this plan',
-            approveStyle: 'min-height:60px;border-radius:999px;font-size:18px;font-weight:700;cursor:pointer;' + (approved ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;'),
-            approveNote: approved ? 'Your companion will remind you and have a prep brief ready before each event.' : 'Approving adds these to your schedule and follow-ups. You can change it any time.',
-            approve: () => this.setState({ approved: !approved })
+            approveStyle: 'min-height:56px;border-radius:999px;font-size:17px;font-weight:700;cursor:pointer;' + (approved ? 'background:#14c8a8;color:#06251f;border:2px solid #14c8a8;' : 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;'),
+            approveNote: approved ? 'Your companion will remind you and have a prep brief ready before each block.' : 'Skipping or removing a block takes it off your schedule straight away.',
+            approve: () => this.setState({ approved: !approved }),
+            reset: () => {
+              PlanStore.reset();
+              this.setState({ approved: false, noteKind: 'quiet', note: 'Back to the plan your companion proposed.' });
+            },
+            add: () => {
+              const f = this.readForm();
+              if (!f.title) {
+                const el = document.getElementById('f-title');
+                if (el) el.focus();
+                this.setState({ noteKind: 'warn', note: 'Give it a name first.' });
+                return;
+              }
+              const timed = f.kind !== 'follow';
+              PlanStore.add({
+                kind: f.kind,
+                title: f.title,
+                d: isNaN(f.d) ? 2 : f.d,
+                start: timed ? f.start : null,
+                end: timed ? f.start + f.length : null,
+                where: f.where,
+                why: 'Added by you on the plan page.',
+                who: [],
+                added: true,
+                skipped: false
+              });
+              this.setState({
+                approved: false,
+                noteKind: 'quiet',
+                note: timed ? 'Added. It is on your schedule too.' : 'Added as a follow-up.'
+              });
+            }
           };
         }
       }

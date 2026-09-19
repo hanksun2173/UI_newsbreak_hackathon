@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Schedule</title>
     <script src="./support.js"></script>
+    <script src="./store.js"></script>
   </head>
   <body>
     <x-dc>
@@ -96,16 +97,6 @@
                   text-decoration: none;
                   font-weight: 500;">Plan</a>
               <a
-                href="Events.dc.html"
-                style="display: flex;
-                  align-items: center;
-                  min-height: 48px;
-                  padding: 0 14px;
-                  border-radius: 14px;
-                  color: #e4defc;
-                  text-decoration: none;
-                  font-weight: 500;">Events</a>
-              <a
                 href="People.dc.html"
                 style="display: flex;
                   align-items: center;
@@ -114,7 +105,7 @@
                   border-radius: 14px;
                   color: #e4defc;
                   text-decoration: none;
-                  font-weight: 500;">People</a>
+                  font-weight: 500;">Map</a>
               <a
                 href="FollowUps.dc.html"
                 style="display: flex;
@@ -191,6 +182,19 @@
                   stroke-linejoin="round"
                   aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
               </button>
+              <a
+                href="Plan.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  height: 44px;
+                  padding: 0 20px;
+                  border-radius: 999px;
+                  background: #161141;
+                  border: 2px solid #3a3080;
+                  color: #cfc6ff;
+                  font-size: 15px;
+                  font-weight: 700;
+                  text-decoration: none;">Edit plan</a>
               <button
                 type="button"
                 style="display: flex;
@@ -535,35 +539,52 @@
                 </div>
               </sc-if>
 
-              <!-- Fields: every one labelled and accented so the shape is obvious -->
-              <div
-                style="display: grid;
-                  grid-template-columns: repeat(2, minmax(0, 1fr));
-                  column-gap: 32px;
-                  row-gap: 18px;">
-                <sc-for list="{{ detail.fields }}" as="f" hint-placeholder-count="8">
-                  <div style="{{ f.style }}">
-                    <div style="{{ f.labelStyle }}">{{ f.label }}</div>
-                    <div style="font-size: 15px; line-height: 1.45; color: #f3f0ff;">{{ f.value }}</div>
-                  </div>
-                </sc-for>
-              </div>
+              <!-- Fields -->
+              <sc-if value="{{ detail.showDetails }}" hint-placeholder-val="{{ true }}">
+                <div
+                  style="display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    column-gap: 32px;
+                    row-gap: 18px;">
+                  <sc-for list="{{ detail.fields }}" as="f" hint-placeholder-count="8">
+                    <div style="{{ f.style }}">
+                      <div style="{{ f.labelStyle }}">{{ f.label }}</div>
+                      <div style="font-size: 15px; line-height: 1.45; color: #f3f0ff;">{{ f.value }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
 
+              <!-- Prep brief: the companion's summary of the same block -->
+              <sc-if value="{{ detail.showBrief }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 22px;">
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="{{ detail.brief.labelStyle }}">Companion summary</div>
+                    <div style="font-size: 16px; line-height: 1.6; color: #f3f0ff;">{{ detail.brief.summary }}</div>
+                  </div>
+                  <sc-for list="{{ detail.brief.sections }}" as="sec" hint-placeholder-count="2">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                      <div style="{{ sec.labelStyle }}">{{ sec.heading }}</div>
+                      <sc-for list="{{ sec.items }}" as="li" hint-placeholder-count="4">
+                        <div style="display: flex; align-items: flex-start; gap: 12px;">
+                          <div style="{{ li.dotStyle }}"></div>
+                          <div style="flex-grow: 1; font-size: 15px; line-height: 1.5; color: #e4defc;">{{ li.text }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
               <!-- Footer -->
               <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                 <sc-for list="{{ detail.actions }}" as="a" hint-placeholder-count="2">
-                  <button type="button" style="{{ a.style }}">{{ a.label }}</button>
+                  <button type="button" onClick="{{ a.click }}" style="{{ a.style }}">{{ a.label }}</button>
                 </sc-for>
-                <div
-                  style="margin-left: auto;
-                    font-size: 13px;
-                    color: #6f6a99;">Sample data · fields fill from the backend later.</div>
+                <div style="margin-left: auto; font-size: 13px; color: #6f6a99;">{{ detail.note }}</div>
               </div>
-
             </div>
           </div>
         </sc-if>
-
       </div>
     </x-dc>
     <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":940}}'>
@@ -572,10 +593,12 @@
           super(props);
           // `answer` stays null until the backend answers. See askCompanion() below.
           // `selected` holds the id of the block whose details are open.
-          this.state = { query: '', answer: null, pending: false, selected: null };
+          this.state = { query: '', answer: null, pending: false, selected: null, brief: false };
           document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.state.selected) this.setState({ selected: null });
+            if (e.key === 'Escape' && this.state.selected) this.setState({ selected: null, brief: false });
           });
+          // The plan page changed the week: redraw with what it wrote.
+          PlanStore.subscribe(() => this.setState({}));
         }
 
         // Opening details re-renders, so keep whatever is half-typed in the ask bar.
@@ -594,6 +617,31 @@
           });
         }
 
+        // --- AI integration point ---------------------------------------------
+        // The prep brief is written by the companion. Until the backend exists it
+        // comes from the sample records below. Swap this for the real call and keep
+        // the shape: { summary, sections: [{ heading, items: [string] }] }.
+        briefFor(title) {
+          const rec = this.blockDetails()[title];
+          return rec && rec.brief ? rec.brief : null;
+        }
+
+        // A block that came from the plan page and has no written record yet.
+        planRecord(p) {
+          const day = PlanStore.day(p.d);
+          return {
+            badge: PlanStore.KINDS[p.kind] || 'Block',
+            fields: [
+              { label: 'When', value: day.day + ' Sep ' + day.date + ' · ' + PlanStore.range(p.start, p.end) },
+              { label: 'Where', value: p.where || 'Not set yet' },
+              { label: 'People', value: (p.who || []).length ? p.who.join(', ') : 'Nobody tagged yet' },
+              { label: 'Added', value: p.added ? 'By you, on the plan page' : 'By your companion' },
+              { label: 'Why it is in your plan', value: p.why || 'Added by you.', span: true }
+            ],
+            actions: ['Edit in plan']
+          };
+        }
+
         // Placeholder detail records, keyed by block title. A meeting carries the
         // person, an event carries the event, a class carries the course. Swap the
         // whole map for backend data later; the shape is what the popup renders.
@@ -601,6 +649,23 @@
           return {
             'Coffee with Maya Chen': {
               badge: 'Coffee chat',
+              brief: {
+                summary: 'You have met Maya once, at Demo Night. She runs design at a forty person startup, she is quietly hiring contract help, and she owes you nothing yet. Make this coffee useful to her before you ask for anything.',
+                sections: [
+                  { heading: 'Background', items: [
+                      'Design lead at Lumen Labs since 2024. Joined as the third designer and now runs a team of six.',
+                      'Six years before that at Northwind, mostly on onboarding and growth.',
+                      'Studied human computer interaction here, and still critiques the senior studio each spring.',
+                      'Runs the monthly Design and Coffee meetup with Priya Nair.'
+                  ] },
+                  { heading: 'Recent activity', items: [
+                      'Sep 15 — posted about cutting their onboarding from nine steps to four.',
+                      'Sep 12 — spoke at Demo Night on design systems that survive a rewrite.',
+                      'Sep 4 — shipped a public changelog she wrote herself.',
+                      'Aug 28 — asked her network for a front end contractor for Q4.'
+                  ] }
+                ]
+              },
               person: { initials: 'MC', name: 'Maya Chen', role: 'Design lead · Lumen Labs' },
               fields: [
                 { label: 'How you met', value: 'Demo Night on Sep 12, introduced by Priya Nair' },
@@ -617,6 +682,25 @@
             },
             'Career fair · Climate tech row': {
               badge: 'Event',
+              brief: {
+                summary: 'Fourteen employers, two hours, and one row that matters to you. Verdant and Lumen both have booths, and Daniel Okafor asked you to find him before 1:30.',
+                sections: [
+                  { heading: 'Topics covered', items: [
+                      'Summer internship hiring for climate and energy teams.',
+                      'What a strong second year portfolio looks like.',
+                      'On site and remote tracks for next summer.',
+                      'Verdant grid modelling work, which overlaps your CS 348 project.',
+                      'Pay bands and housing stipends, posted at each booth.'
+                  ] },
+                  { heading: 'Materials to bring', items: [
+                      'Six printed résumés, one page each.',
+                      'Student ID, needed at the door.',
+                      'Laptop with the CS 348 project already running.',
+                      'Two sentences on what you want to build.',
+                      'Notebook for names and next steps.'
+                  ] }
+                ]
+              },
               fields: [
                 { label: 'Host', value: 'University Career Center' },
                 { label: 'Format', value: 'Booth fair, drop in any time' },
@@ -632,6 +716,25 @@
             },
             'Hackathon kickoff': {
               badge: 'Event',
+              brief: {
+                summary: 'Thirty minutes of talk, then ninety of team forming. You still need two teammates, and Priya has one seat left on a climate team.',
+                sections: [
+                  { heading: 'Topics covered', items: [
+                      'The three tracks and what counts as in scope.',
+                      'Judging criteria, weighted towards a working demo.',
+                      'Sponsor APIs and credits you can use for free.',
+                      'How team formation works after the talk.',
+                      'Submission deadline and the demo running order.'
+                  ] },
+                  { heading: 'Materials to bring', items: [
+                      'Laptop and charger.',
+                      'Student ID for the building after hours.',
+                      'One idea worth pitching out loud.',
+                      'A GitHub account you can actually log into.',
+                      'Water bottle, the lab runs warm.'
+                  ] }
+                ]
+              },
               fields: [
                 { label: 'Host', value: 'Northwind Labs with the ACM chapter' },
                 { label: 'Format', value: 'Kickoff talk, then team formation' },
@@ -647,6 +750,23 @@
             },
             'ACM Club info session': {
               badge: 'Event',
+              brief: {
+                summary: 'This one has passed. Here is what was covered and what is still worth chasing.',
+                sections: [
+                  { heading: 'Topics covered', items: [
+                      'Club projects running this term and who leads each one.',
+                      'Hackathon team sign ups, which Priya ran on paper.',
+                      'Officer roles opening in November.',
+                      'Mentorship pairing with alumni.',
+                      'Dues, and the waiver if you volunteer.'
+                  ] },
+                  { heading: 'Follow-ups', items: [
+                      'Message Priya to get on the hackathon list.',
+                      'Pick a club project before the Oct 3 cutoff.',
+                      'Ana Ruiz offered to introduce you to the robotics lead.'
+                  ] }
+                ]
+              },
               fields: [
                 { label: 'Host', value: 'ACM student chapter' },
                 { label: 'Format', value: 'Short talk, then pizza' },
@@ -773,19 +893,13 @@
           const todayIndex = 2;
           const nowTime = 11.33;
 
-          const days = [
-            { day: 'Mon', date: '21', note: '3 classes' },
-            { day: 'Tue', date: '22', note: '2 classes · 1 event' },
-            { day: 'Wed', date: '23', note: 'Today · 4 blocks' },
-            { day: 'Thu', date: '24', note: '2 classes · 1 event' },
-            { day: 'Fri', date: '25', note: '2 classes · 1 event' }
-          ];
+          const days = PlanStore.DAYS.map((d) => ({ day: d.day, date: d.date }));
 
-          const items = [
+          // Fixed part of the week: classes, labs and study time.
+          const classBlocks = [
             // Monday
             { d: 0, kind: 'class', start: 9.5, end: 10.75, title: 'CS 348 · Distributed Systems', meta: '9:30–10:45 · Gates 104' },
             { d: 0, kind: 'class', start: 11, end: 12.25, title: 'ECON 202 · Macroeconomics', meta: '11:00–12:15 · Hobbs 210' },
-            { d: 0, kind: 'event', start: 12.5, end: 13.5, title: 'ACM Club info session', meta: '12:30–1:30 · Union hall' },
             { d: 0, kind: 'class', start: 14, end: 15.25, title: 'CS 348 Lab', meta: '2:00–3:15 · Gates B12' },
 
             // Tuesday
@@ -795,20 +909,31 @@
 
             // Wednesday (today)
             { d: 2, kind: 'class', start: 9.5, end: 10.75, title: 'CS 348 · Distributed Systems', meta: '9:30–10:45 · Gates 104' },
-            { d: 2, kind: 'meeting', start: 11, end: 11.75, title: 'Coffee with Maya Chen', meta: '11:00–11:45 · Corner Café' },
             { d: 2, kind: 'class', start: 13, end: 14.25, title: 'ECON 202 · Macroeconomics', meta: '1:00–2:15 · Hobbs 210' },
             { d: 2, kind: 'study', start: 15.5, end: 16.5, title: 'Office hours · Prof. Alvarez', meta: '3:30–4:30 · Gates 417' },
 
             // Thursday
             { d: 3, kind: 'class', start: 10, end: 11.33, title: 'STAT 210 · Inference', meta: '10:00–11:20 · Rhodes 301' },
-            { d: 3, kind: 'event', start: 12.5, end: 14, title: 'Career fair · Climate tech row', meta: '12:30–2:00 · Field house' },
             { d: 3, kind: 'class', start: 15, end: 16.33, title: 'PHIL 105 · Ethics of Tech', meta: '3:00–4:20 · Sage 120' },
 
             // Friday
             { d: 4, kind: 'class', start: 9.5, end: 10.75, title: 'CS 348 · Distributed Systems', meta: '9:30–10:45 · Gates 104' },
-            { d: 4, kind: 'class', start: 11, end: 12.25, title: 'ECON 202 · Macroeconomics', meta: '11:00–12:15 · Hobbs 210' },
-            { d: 4, kind: 'event', start: 15, end: 16.75, title: 'Hackathon kickoff', meta: '3:00–4:45 · Innovation lab' }
-          ].map((it, idx) => ({ ...it, id: 'b' + idx }));
+            { d: 4, kind: 'class', start: 11, end: 12.25, title: 'ECON 202 · Macroeconomics', meta: '11:00–12:15 · Hobbs 210' }
+          ];
+
+          // Everything the plan page put in the week. Skip or remove it there and
+          // it leaves this grid on the next render.
+          const planBlocks = PlanStore.blocks().map((p) => ({
+            d: p.d,
+            kind: p.kind,
+            start: p.start,
+            end: p.end,
+            title: p.title,
+            meta: PlanStore.range(p.start, p.end) + (p.where ? ' · ' + p.where : ''),
+            plan: p
+          }));
+
+          const items = classBlocks.concat(planBlocks).map((it, idx) => ({ ...it, id: 'b' + idx }));
 
           const hours = [];
           for (let h = START; h <= END; h++) {
@@ -824,10 +949,17 @@
           const shapedDays = days.map((d, i) => {
             const past = i < todayIndex;
             const isToday = i === todayIndex;
+            const mine = items.filter((it) => it.d === i);
+            const fixed = mine.filter((it) => it.kind === 'class' || it.kind === 'study').length;
+            const planned = mine.length - fixed;
+            const parts = [];
+            if (fixed) parts.push(fixed + (fixed === 1 ? ' class' : ' classes'));
+            if (planned) parts.push(planned + (planned === 1 ? ' event' : ' events'));
+            const note = parts.length ? parts.join(' · ') : 'Clear';
             return {
               ...d,
               isToday: isToday,
-              note: isToday ? d.note : (past ? 'Done' : d.note),
+              note: isToday ? 'Today · ' + note : (past ? 'Done' : note),
               headStyle: 'flex-grow:1;flex-basis:0;min-width:0;display:flex;flex-direction:column;gap:4px;padding:0 8px;' + (past ? 'opacity:0.4;' : ''),
               dateStyle: 'display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:10px;font-family:\'Instrument Serif\', Georgia, serif;font-size:20px;line-height:1;' + (isToday ? 'background:#5b3df5;color:#ffffff;' : 'background:#241c52;color:#e4defc;'),
               colStyle: 'position:relative;height:100%;padding:0 6px;box-sizing:border-box;border-left:1px solid #241c52;' + (isToday ? 'background:rgba(91,61,245,0.07);' : ''),
@@ -845,11 +977,11 @@
                   meta: it.meta,
                   tooltip: it.title + ' · ' + it.meta,
                   selected: isSel,
-                  open: () => this.setState({ selected: it.id, query: this.liveQuery() }),
+                  open: () => this.setState({ selected: it.id, brief: false, query: this.liveQuery() }),
                   key: (e) => {
                     if (e.key !== 'Enter' && e.key !== ' ') return;
                     e.preventDefault();
-                    this.setState({ selected: it.id, query: this.liveQuery() });
+                    this.setState({ selected: it.id, brief: false, query: this.liveQuery() });
                   },
                   cardStyle: 'position:absolute;left:4px;right:4px;top:' + top + '%;height:calc(' + height + '% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:3px;overflow:hidden;border-radius:12px;cursor:pointer;background:' + k.bg + ';border-left:3px solid ' + k.border + ';' + (tight ? 'padding:4px 10px;' : 'padding:8px 10px;') + (past && !isSel ? 'opacity:0.38;' : '') + (isSel ? 'outline:2px solid #ffffff;outline-offset:2px;box-shadow:0 12px 28px rgba(0,0,0,0.55);z-index:5;' : ''),
                   titleStyle: 'font-size:13.5px;font-weight:700;line-height:1.25;overflow:hidden;color:' + k.text + ';',
@@ -865,18 +997,43 @@
           if (selected) {
             const k = kinds[selected.kind];
             const accent = { class: '#8f88ff', event: '#14e0bb', study: '#a49fc4', meeting: '#ff6a5c' }[selected.kind];
-            const rec = this.blockDetails()[selected.title] || { badge: 'Block', fields: [], actions: [] };
+            const rec = this.blockDetails()[selected.title]
+            || (selected.plan ? this.planRecord(selected.plan) : { badge: 'Block', fields: [], actions: [] });
+            const isPlan = !!selected.plan;
+            const baseActions = showBrief ? ['Back to details', 'Regenerate'] : (rec.actions || []).slice();
+            if (!showBrief && isPlan && baseActions.indexOf('Edit in plan') < 0) {
+              if (baseActions.length > 1) baseActions[1] = 'Edit in plan';
+              else baseActions.push('Edit in plan');
+            }
             const d = days[selected.d];
             // Sit the popup on the far side of the week from the block that is open,
             // so the highlighted block is never behind it.
             const side = selected.d <= 1 ? 'flex-end' : 'flex-start';
+            const brief = this.briefFor(selected.title);
+            const showBrief = st.brief && !!brief;
+            const label = 'font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8e88b8;';
             detail = {
+              showBrief: showBrief,
+              note: showBrief ? 'Sample text · your companion writes this once connected.' : 'Sample data · fields fill from the backend later.',
+              showDetails: !showBrief,
+              brief: showBrief ? {
+                labelStyle: label,
+                summary: brief.summary,
+                sections: brief.sections.map((sec) => ({
+                  heading: sec.heading,
+                  labelStyle: label,
+                  items: sec.items.map((text) => ({
+                    text: text,
+                    dotStyle: 'width:6px;height:6px;flex-shrink:0;margin-top:9px;border-radius:999px;background:' + accent + ';'
+                  }))
+                }))
+              } : null,
               scrimStyle: 'position:absolute;inset:0;z-index:40;display:flex;align-items:center;padding:32px;background:rgba(5,3,18,0.45);justify-content:' + side + ';',
               cardStyle: 'width:580px;max-height:100%;overflow-y:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;padding:26px;border-radius:28px;background:#161141;border:1px solid #3a3080;box-shadow:0 30px 70px rgba(0,0,0,0.6);',
-              badge: rec.badge,
+              badge: showBrief ? 'Prep brief' : rec.badge,
               badgeStyle: 'display:inline-flex;align-items:center;align-self:flex-start;height:30px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:0.04em;background:' + accent + ';color:#0d0a24;',
               title: selected.title,
-              meta: d.day + ' Sep ' + d.date + ' · ' + selected.meta,
+              meta: showBrief ? 'Written by your companion · ' + d.day + ' Sep ' + d.date : d.day + ' Sep ' + d.date + ' · ' + selected.meta,
               hasPerson: !!rec.person,
               personStyle: 'display:flex;align-items:center;gap:16px;padding-bottom:18px;border-bottom:1px solid #2c2360;',
               person: rec.person ? {
@@ -891,8 +1048,11 @@
                 style: 'display:flex;flex-direction:column;gap:3px;' + (f.span ? 'grid-column:span 2;' : ''),
                 labelStyle: 'font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8e88b8;'
               })),
-              actions: (rec.actions || []).map((label, i) => ({
-                label: label,
+              actions: baseActions.map((text, i) => ({
+                label: text,
+                click: i === 0 && brief ? () => this.setState({ brief: !showBrief })
+                : text === 'Edit in plan' ? () => { window.location.href = 'Plan.dc.html'; }
+                : null,
                 style: 'min-height:46px;padding:0 22px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (i === 0 ? 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;' : 'background:transparent;color:#cfc6ff;border:2px solid #3a3080;')
               }))
             };
@@ -914,7 +1074,7 @@
             hasAnswer: !!st.answer || st.pending,
             detail: detail,
             hasDetail: !!detail,
-            closeDetail: () => this.setState({ selected: null, query: this.liveQuery() }),
+            closeDetail: () => this.setState({ selected: null, brief: false, query: this.liveQuery() }),
             stopClick: (e) => e.stopPropagation(),
             prompts: suggestions.map((label) => ({
               label: label,
