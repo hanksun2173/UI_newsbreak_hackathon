@@ -33,6 +33,7 @@
       <div
         style="width: 1440px;
           min-height: 940px;
+          position: relative;
           box-sizing: border-box;
           display: flex;
           overflow: hidden;
@@ -422,7 +423,14 @@
                           style="{{ d.nowStyle }}"><div style="position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 999px; background: #ff5a4e;"></div></div>
                       </sc-if>
                       <sc-for list="{{ d.items }}" as="it" hint-placeholder-count="3">
-                        <div style="{{ it.cardStyle }}" title="{{ it.tooltip }}">
+                        <div
+                          style="{{ it.cardStyle }}"
+                          title="{{ it.tooltip }}"
+                          role="button"
+                          tabindex="0"
+                          aria-pressed="{{ it.selected }}"
+                          onClick="{{ it.open }}"
+                          onKeyDown="{{ it.key }}">
                           <div style="{{ it.titleStyle }}">{{ it.title }}</div>
                           <div style="{{ it.metaStyle }}">{{ it.meta }}</div>
                         </div>
@@ -465,6 +473,97 @@
 
           </div>
         </div>
+
+        <!-- DETAIL POPUP: opens on a block click, closes on the scrim, the X or Escape -->
+        <sc-if value="{{ hasDetail }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ closeDetail }}" style="{{ detail.scrimStyle }}">
+            <div
+              onClick="{{ stopClick }}"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Block details"
+              style="{{ detail.cardStyle }}">
+
+              <!-- Header -->
+              <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <div style="{{ detail.badgeStyle }}">{{ detail.badge }}</div>
+                  <h2
+                    style="margin: 0;
+                      font-family: 'Instrument Serif', Georgia, serif;
+                      font-weight: 400;
+                      font-size: 28px;
+                      line-height: 1.1;
+                      letter-spacing: -0.01em;">{{ detail.title }}</h2>
+                  <div style="font-size: 15px; color: #a9a3cf;">{{ detail.meta }}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick="{{ closeDetail }}"
+                  aria-label="Close details"
+                  style="display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    flex-shrink: 0;
+                    border-radius: 999px;
+                    background: #241c52;
+                    border: 1px solid #3a3080;
+                    color: #cfc6ff;
+                    cursor: pointer;">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
+              </div>
+
+              <!-- Person, for a meeting -->
+              <sc-if value="{{ detail.hasPerson }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ detail.personStyle }}">
+                  <div style="{{ detail.person.avatarStyle }}">{{ detail.person.initials }}</div>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="font-size: 20px; font-weight: 700;">{{ detail.person.name }}</div>
+                    <div style="font-size: 15px; color: #a9a3cf;">{{ detail.person.role }}</div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- Fields: every one labelled and accented so the shape is obvious -->
+              <div
+                style="display: grid;
+                  grid-template-columns: repeat(2, minmax(0, 1fr));
+                  column-gap: 32px;
+                  row-gap: 18px;">
+                <sc-for list="{{ detail.fields }}" as="f" hint-placeholder-count="8">
+                  <div style="{{ f.style }}">
+                    <div style="{{ f.labelStyle }}">{{ f.label }}</div>
+                    <div style="font-size: 15px; line-height: 1.45; color: #f3f0ff;">{{ f.value }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- Footer -->
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <sc-for list="{{ detail.actions }}" as="a" hint-placeholder-count="2">
+                  <button type="button" style="{{ a.style }}">{{ a.label }}</button>
+                </sc-for>
+                <div
+                  style="margin-left: auto;
+                    font-size: 13px;
+                    color: #6f6a99;">Sample data · fields fill from the backend later.</div>
+              </div>
+
+            </div>
+          </div>
+        </sc-if>
+
       </div>
     </x-dc>
     <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":940}}'>
@@ -472,7 +571,17 @@
         constructor(props) {
           super(props);
           // `answer` stays null until the backend answers. See askCompanion() below.
-          this.state = { query: '', answer: null, pending: false };
+          // `selected` holds the id of the block whose details are open.
+          this.state = { query: '', answer: null, pending: false, selected: null };
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.state.selected) this.setState({ selected: null });
+          });
+        }
+
+        // Opening details re-renders, so keep whatever is half-typed in the ask bar.
+        liveQuery() {
+          const field = document.getElementById('ask');
+          return field ? field.value : this.state.query;
         }
 
         // --- AI integration point -------------------------------------------------
@@ -483,6 +592,166 @@
           return Promise.resolve({
             text: 'Connect the companion backend to answer this. It will have your ' + context.items.length + ' blocks for ' + context.week + ' as context, so it can suggest times, flag conflicts and prep you for people you are about to meet.'
           });
+        }
+
+        // Placeholder detail records, keyed by block title. A meeting carries the
+        // person, an event carries the event, a class carries the course. Swap the
+        // whole map for backend data later; the shape is what the popup renders.
+        blockDetails() {
+          return {
+            'Coffee with Maya Chen': {
+              badge: 'Coffee chat',
+              person: { initials: 'MC', name: 'Maya Chen', role: 'Design lead · Lumen Labs' },
+              fields: [
+                { label: 'How you met', value: 'Demo Night on Sep 12, introduced by Priya Nair' },
+                { label: 'Last contact', value: 'Sep 14 · you sent the onboarding article' },
+                { label: 'Mutual connections', value: 'Priya Nair, Ana Ruiz, Tom Beck' },
+                { label: 'Works on', value: 'Onboarding, design systems, local meetups' },
+                { label: 'Looking for', value: 'A front-end contractor for the Q4 rebuild' },
+                { label: 'You can offer', value: 'An intro to Daniel Okafor at Verdant' },
+                { label: 'Contact', value: 'maya.chen@lumenlabs.example · @mayacchen' },
+                { label: 'Where', value: 'Corner Café, 2 blocks from Gates' },
+                { label: 'Companion note', value: 'She mentioned an onboarding revamp last time. Ask how it landed, then offer the Daniel intro before you leave.', span: true }
+              ],
+              actions: ['Open prep brief', 'Send a message']
+            },
+            'Career fair · Climate tech row': {
+              badge: 'Event',
+              fields: [
+                { label: 'Host', value: 'University Career Center' },
+                { label: 'Format', value: 'Booth fair, drop in any time' },
+                { label: 'Where', value: 'Field house, north entrance' },
+                { label: 'Turnout', value: '14 employers · 380 students registered' },
+                { label: 'People you know', value: 'Daniel Okafor (recruiter, Verdant), Ana Ruiz' },
+                { label: 'Focus areas', value: 'Climate tech, energy, hardware' },
+                { label: 'Cost', value: 'Free with student ID' },
+                { label: 'Your RSVP', value: 'Registered on Sep 8' },
+                { label: 'Companion note', value: 'Verdant and Lumen both have booths in this row. Six résumés is enough, and Daniel said to find him before 1:30.', span: true }
+              ],
+              actions: ['Open prep brief', 'See who is going']
+            },
+            'Hackathon kickoff': {
+              badge: 'Event',
+              fields: [
+                { label: 'Host', value: 'Northwind Labs with the ACM chapter' },
+                { label: 'Format', value: 'Kickoff talk, then team formation' },
+                { label: 'Where', value: 'Innovation lab, building C' },
+                { label: 'Turnout', value: '120 registered · 31 teams so far' },
+                { label: 'People you know', value: 'Priya Nair, Maya Chen, Daniel Okafor (judge)' },
+                { label: 'Tracks', value: 'Climate, health, developer tools' },
+                { label: 'Prizes', value: 'Interview slots with four sponsors' },
+                { label: 'Bring', value: 'Laptop, charger, one idea worth pitching' },
+                { label: 'Companion note', value: 'You still need two teammates. Priya is forming a climate team and has one seat left.', span: true }
+              ],
+              actions: ['Open prep brief', 'See who is going']
+            },
+            'ACM Club info session': {
+              badge: 'Event',
+              fields: [
+                { label: 'Host', value: 'ACM student chapter' },
+                { label: 'Format', value: 'Short talk, then pizza' },
+                { label: 'Where', value: 'Union hall, room 2B' },
+                { label: 'Turnout', value: '48 going · 12 maybe' },
+                { label: 'People you know', value: 'Priya Nair (organizer), Ana Ruiz' },
+                { label: 'Topics', value: 'Club projects, hackathon teams, officer roles' },
+                { label: 'Cost', value: 'Free · pizza provided' },
+                { label: 'Your RSVP', value: 'Going · added Sep 16' },
+                { label: 'Companion note', value: 'This one has passed. Priya ran sign-ups, so message her if you still want on the hackathon list.', span: true }
+              ],
+              actions: ['Open recap', 'See who went']
+            },
+            'CS 348 · Distributed Systems': {
+              badge: 'Class',
+              fields: [
+                { label: 'Instructor', value: 'Prof. Renata Alvarez' },
+                { label: 'Room', value: 'Gates 104, third floor' },
+                { label: 'Format', value: 'Lecture · slides posted after' },
+                { label: 'This week', value: 'Lecture 12 — consensus and Raft' },
+                { label: 'Next deadline', value: 'PS4 due Friday, 11:59 pm' },
+                { label: 'Grading', value: 'Problem sets 40% · project 35% · final 25%' },
+                { label: 'Classmates you know', value: 'Ana Ruiz, Tom Beck, and nine others', span: true }
+              ],
+              actions: ['Open course page', 'Add a reminder']
+            },
+            'ECON 202 · Macroeconomics': {
+              badge: 'Class',
+              fields: [
+                { label: 'Instructor', value: 'Prof. Ian Whitfield' },
+                { label: 'Room', value: 'Hobbs 210' },
+                { label: 'Format', value: 'Lecture plus Thursday section' },
+                { label: 'This week', value: 'Monetary policy, part two' },
+                { label: 'Next deadline', value: 'Essay draft due Monday' },
+                { label: 'Grading', value: 'Essays 50% · midterms 40% · attendance 10%' },
+                { label: 'Classmates you know', value: 'Jordan Pike, Sofia Lindqvist', span: true }
+              ],
+              actions: ['Open course page', 'Add a reminder']
+            },
+            'STAT 210 · Inference': {
+              badge: 'Class',
+              fields: [
+                { label: 'Instructor', value: 'Prof. Dara Osei' },
+                { label: 'Room', value: 'Rhodes 301' },
+                { label: 'Format', value: 'Lecture · laptops closed' },
+                { label: 'This week', value: 'Hypothesis testing II' },
+                { label: 'Next deadline', value: 'Lab report due Thursday' },
+                { label: 'Grading', value: 'Labs 35% · quizzes 25% · final 40%' },
+                { label: 'Classmates you know', value: 'Tom Beck, Mei Tanaka', span: true }
+              ],
+              actions: ['Open course page', 'Add a reminder']
+            },
+            'PHIL 105 · Ethics of Tech': {
+              badge: 'Class',
+              fields: [
+                { label: 'Instructor', value: 'Prof. Nils Hagen' },
+                { label: 'Room', value: 'Sage 120' },
+                { label: 'Format', value: 'Seminar · students lead discussion' },
+                { label: 'This week', value: 'Reading: Nissenbaum on privacy' },
+                { label: 'Next deadline', value: 'Response paper due Tuesday' },
+                { label: 'Grading', value: 'Papers 55% · participation 25% · lead 20%' },
+                { label: 'Classmates you know', value: 'Ana Ruiz, Jordan Pike', span: true }
+              ],
+              actions: ['Open course page', 'Add a reminder']
+            },
+            'CS 348 Lab': {
+              badge: 'Class',
+              fields: [
+                { label: 'Led by', value: 'Sam Whitaker, teaching assistant' },
+                { label: 'Room', value: 'Gates B12' },
+                { label: 'Format', value: 'Hands on · bring a laptop' },
+                { label: 'This week', value: 'Lab 6 — replication and failover' },
+                { label: 'Next deadline', value: 'Check off before you leave' },
+                { label: 'Pairing', value: 'Paired with Tom Beck this week' },
+                { label: 'Classmates you know', value: 'Tom Beck, Mei Tanaka', span: true }
+              ],
+              actions: ['Open course page', 'Add a reminder']
+            },
+            'Study group · problem set': {
+              badge: 'Study',
+              fields: [
+                { label: 'Who is coming', value: 'Ana Ruiz, Tom Beck, Jordan Pike' },
+                { label: 'Where', value: 'Library 2F · room held until 1:15' },
+                { label: 'Focus', value: 'PS4, problems three through five' },
+                { label: 'Bring', value: 'Laptop and lecture notes' },
+                { label: 'Booked by', value: 'You, on Sep 15' },
+                { label: 'Recurring', value: 'Every Tuesday this term' },
+                { label: 'Companion note', value: 'Ana asked for your notes from lecture 11. Bring them and you can skip the recap.', span: true }
+              ],
+              actions: ['Open notes', 'Add a reminder']
+            },
+            'Office hours · Prof. Alvarez': {
+              badge: 'Study',
+              fields: [
+                { label: 'Instructor', value: 'Prof. Renata Alvarez' },
+                { label: 'Room', value: 'Gates 417' },
+                { label: 'Format', value: 'Drop in · queue sheet on the door' },
+                { label: 'Your question', value: 'Scope for the term project' },
+                { label: 'Typical wait', value: 'About 10 minutes' },
+                { label: 'Sign up', value: 'Sheet posts Wednesday at 9 am' },
+                { label: 'Companion note', value: 'Bring the one page outline. She turns away vague project questions.', span: true }
+              ],
+              actions: ['Open course page', 'Add a reminder']
+            }
+          };
         }
 
         renderVals() {
@@ -539,7 +808,7 @@
             { d: 4, kind: 'class', start: 9.5, end: 10.75, title: 'CS 348 · Distributed Systems', meta: '9:30–10:45 · Gates 104' },
             { d: 4, kind: 'class', start: 11, end: 12.25, title: 'ECON 202 · Macroeconomics', meta: '11:00–12:15 · Hobbs 210' },
             { d: 4, kind: 'event', start: 15, end: 16.75, title: 'Hackathon kickoff', meta: '3:00–4:45 · Innovation lab' }
-          ];
+          ].map((it, idx) => ({ ...it, id: 'b' + idx }));
 
           const hours = [];
           for (let h = START; h <= END; h++) {
@@ -561,7 +830,7 @@
               note: isToday ? d.note : (past ? 'Done' : d.note),
               headStyle: 'flex-grow:1;flex-basis:0;min-width:0;display:flex;flex-direction:column;gap:4px;padding:0 8px;' + (past ? 'opacity:0.4;' : ''),
               dateStyle: 'display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 8px;border-radius:10px;font-family:\'Instrument Serif\', Georgia, serif;font-size:20px;line-height:1;' + (isToday ? 'background:#5b3df5;color:#ffffff;' : 'background:#241c52;color:#e4defc;'),
-              colStyle: 'position:relative;height:100%;padding:0 6px;box-sizing:border-box;border-left:1px solid #241c52;' + (past ? 'opacity:0.34;' : '') + (isToday ? 'background:rgba(91,61,245,0.07);' : ''),
+              colStyle: 'position:relative;height:100%;padding:0 6px;box-sizing:border-box;border-left:1px solid #241c52;' + (isToday ? 'background:rgba(91,61,245,0.07);' : ''),
               nowStyle: 'position:absolute;left:0;right:0;top:' + pct(nowTime) + '%;height:2px;background:#ff5a4e;',
               items: items.filter((it) => it.d === i).map((it) => {
                 const k = kinds[it.kind];
@@ -570,17 +839,64 @@
                 // Short blocks lose the second line rather than clipping it; the full
                 // detail stays in the tooltip.
                 const tight = (it.end - it.start) <= 0.8;
+                const isSel = st.selected === it.id;
                 return {
                   title: it.title,
                   meta: it.meta,
                   tooltip: it.title + ' · ' + it.meta,
-                  cardStyle: 'position:absolute;left:4px;right:4px;top:' + top + '%;height:calc(' + height + '% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:3px;overflow:hidden;border-radius:12px;background:' + k.bg + ';border-left:3px solid ' + k.border + ';' + (tight ? 'padding:4px 10px;' : 'padding:8px 10px;'),
+                  selected: isSel,
+                  open: () => this.setState({ selected: it.id, query: this.liveQuery() }),
+                  key: (e) => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault();
+                    this.setState({ selected: it.id, query: this.liveQuery() });
+                  },
+                  cardStyle: 'position:absolute;left:4px;right:4px;top:' + top + '%;height:calc(' + height + '% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:3px;overflow:hidden;border-radius:12px;cursor:pointer;background:' + k.bg + ';border-left:3px solid ' + k.border + ';' + (tight ? 'padding:4px 10px;' : 'padding:8px 10px;') + (past && !isSel ? 'opacity:0.38;' : '') + (isSel ? 'outline:2px solid #ffffff;outline-offset:2px;box-shadow:0 12px 28px rgba(0,0,0,0.55);z-index:5;' : ''),
                   titleStyle: 'font-size:13.5px;font-weight:700;line-height:1.25;overflow:hidden;color:' + k.text + ';',
                   metaStyle: 'font-size:12px;line-height:1.3;color:' + k.meta + ';' + (tight ? 'display:none;' : '')
                 };
               })
             };
           });
+
+          // The open block, shaped for the popup.
+          const selected = items.find((it) => it.id === st.selected) || null;
+          let detail = null;
+          if (selected) {
+            const k = kinds[selected.kind];
+            const accent = { class: '#8f88ff', event: '#14e0bb', study: '#a49fc4', meeting: '#ff6a5c' }[selected.kind];
+            const rec = this.blockDetails()[selected.title] || { badge: 'Block', fields: [], actions: [] };
+            const d = days[selected.d];
+            // Sit the popup on the far side of the week from the block that is open,
+            // so the highlighted block is never behind it.
+            const side = selected.d <= 1 ? 'flex-end' : 'flex-start';
+            detail = {
+              scrimStyle: 'position:absolute;inset:0;z-index:40;display:flex;align-items:center;padding:32px;background:rgba(5,3,18,0.45);justify-content:' + side + ';',
+              cardStyle: 'width:580px;max-height:100%;overflow-y:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;padding:26px;border-radius:28px;background:#161141;border:1px solid #3a3080;box-shadow:0 30px 70px rgba(0,0,0,0.6);',
+              badge: rec.badge,
+              badgeStyle: 'display:inline-flex;align-items:center;align-self:flex-start;height:30px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:700;letter-spacing:0.04em;background:' + accent + ';color:#0d0a24;',
+              title: selected.title,
+              meta: d.day + ' Sep ' + d.date + ' · ' + selected.meta,
+              hasPerson: !!rec.person,
+              personStyle: 'display:flex;align-items:center;gap:16px;padding-bottom:18px;border-bottom:1px solid #2c2360;',
+              person: rec.person ? {
+                initials: rec.person.initials,
+                name: rec.person.name,
+                role: rec.person.role,
+                avatarStyle: 'display:flex;align-items:center;justify-content:center;width:48px;height:48px;flex-shrink:0;border-radius:999px;font-size:19px;font-weight:700;background:' + accent + ';color:#0d0a24;'
+              } : null,
+              fields: rec.fields.map((f) => ({
+                label: f.label,
+                value: f.value,
+                style: 'display:flex;flex-direction:column;gap:3px;' + (f.span ? 'grid-column:span 2;' : ''),
+                labelStyle: 'font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8e88b8;'
+              })),
+              actions: (rec.actions || []).map((label, i) => ({
+                label: label,
+                style: 'min-height:46px;padding:0 22px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (i === 0 ? 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;' : 'background:transparent;color:#cfc6ff;border:2px solid #3a3080;')
+              }))
+            };
+          }
 
           const weekLabel = 'Mon Sep 21 – Fri Sep 25';
           const suggestions = [
@@ -596,6 +912,10 @@
             query: st.query,
             answer: st.pending ? 'Thinking…' : st.answer,
             hasAnswer: !!st.answer || st.pending,
+            detail: detail,
+            hasDetail: !!detail,
+            closeDetail: () => this.setState({ selected: null, query: this.liveQuery() }),
+            stopClick: (e) => e.stopPropagation(),
             prompts: suggestions.map((label) => ({
               label: label,
               pick: () => { this.setState({ query: label }); this.runAsk(label, items, weekLabel); }
@@ -616,11 +936,10 @@
           if (!query || !query.trim()) return;
           this.setState({ pending: true });
           this.askCompanion(query.trim(), { items: items, week: week })
-            .then((res) => this.setState({ pending: false, answer: res.text }))
-            .catch(() => this.setState({ pending: false, answer: 'The companion is not connected yet.' }));
+          .then((res) => this.setState({ pending: false, answer: res.text }))
+          .catch(() => this.setState({ pending: false, answer: 'The companion is not connected yet.' }));
         }
       }
     </script>
   </body>
 </html>
-
