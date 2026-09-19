@@ -1,183 +1,383 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Events</title>
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0d0a24;color:#f3f0ff}
-a{color:#b7a7ff}a:hover{color:#d3c9ff}
-button{font-family:inherit}
-</style>
-</helmet>
-<div style="width: 1440px; height: 1240px; box-sizing: border-box; display: flex; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+  <head>
+    <meta charset="utf-8">
+    <title>Events</title>
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+        <style>
+          body {
+            margin: 0;
+            font-family: 'Hanken Grotesk',system-ui,sans-serif;
+            background: #0d0a24;
+            color: #f3f0ff;
+          }
+          a {
+            color: #b7a7ff;
+          }
+          a:hover {
+            color: #d3c9ff;
+          }
+          button {
+            font-family: inherit;
+          }
+        </style>
+      </helmet>
+      <div
+        style="width: 1440px;
+          height: 1240px;
+          box-sizing: border-box;
+          display: flex;
+          background: #0d0a24;
+          color: #f3f0ff;
+          font-family: 'Hanken Grotesk', system-ui, sans-serif;">
 
-<!-- SIDEBAR -->
-<div style="width: 250px; flex-shrink: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 20px; background: #120c38; border-right: 1px solid #2a2360;">
-<div style="display: flex; flex-direction: column; gap: 48px;">
-<div style="padding: 0 14px; font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; letter-spacing: -0.01em; color: #ffffff;">[Product name]</div>
-<div style="display: flex; flex-direction: column; gap: 6px; font-size: 17px;">
-<a href="App.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Home</a>
-<a href="Plan.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Plan</a>
-<a href="Events.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; background: rgba(255,255,255,0.12); color: #ffffff; text-decoration: none; font-weight: 700;">Events</a>
-<a href="People.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">People</a>
-<a href="FollowUps.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Follow-ups</a>
-</div>
-</div>
-<div style="display: flex; align-items: center; gap: 14px; padding: 0 14px;">
-<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; background: #ffc93c; color: #1a1440; font-size: 16px; font-weight: 700;">H</div>
-<div style="font-size: 16px; font-weight: 600; color: #ffffff;">Hank</div>
-</div>
-</div>
+        <!-- SIDEBAR -->
+        <div
+          style="width: 250px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            background: #120c38;
+            border-right: 1px solid #2a2360;">
+          <div style="display: flex; flex-direction: column; gap: 48px;">
+            <div
+              style="padding: 0 14px;
+                font-family: 'Instrument Serif', Georgia, serif;
+                font-size: 30px;
+                letter-spacing: -0.01em;
+                color: #ffffff;">[Product name]</div>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 17px;">
+              <a
+                href="App.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  min-height: 48px;
+                  padding: 0 14px;
+                  border-radius: 14px;
+                  color: #e4defc;
+                  text-decoration: none;
+                  font-weight: 500;">Home</a>
+              <a
+                href="Schedule.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  min-height: 48px;
+                  padding: 0 14px;
+                  border-radius: 14px;
+                  color: #e4defc;
+                  text-decoration: none;
+                  font-weight: 500;">Schedule</a>
+              <a
+                href="Plan.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  min-height: 48px;
+                  padding: 0 14px;
+                  border-radius: 14px;
+                  color: #e4defc;
+                  text-decoration: none;
+                  font-weight: 500;">Plan</a>
+              <a
+                href="Events.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  min-height: 48px;
+                  padding: 0 14px;
+                  border-radius: 14px;
+                  background: rgba(255,255,255,0.12);
+                  color: #ffffff;
+                  text-decoration: none;
+                  font-weight: 700;">Events</a>
+              <a
+                href="People.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  min-height: 48px;
+                  padding: 0 14px;
+                  border-radius: 14px;
+                  color: #e4defc;
+                  text-decoration: none;
+                  font-weight: 500;">People</a>
+              <a
+                href="FollowUps.dc.html"
+                style="display: flex;
+                  align-items: center;
+                  min-height: 48px;
+                  padding: 0 14px;
+                  border-radius: 14px;
+                  color: #e4defc;
+                  text-decoration: none;
+                  font-weight: 500;">Follow-ups</a>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; padding: 0 14px;">
+            <div
+              style="display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                border-radius: 999px;
+                background: #ffc93c;
+                color: #1a1440;
+                font-size: 16px;
+                font-weight: 700;">H</div>
+            <div style="font-size: 16px; font-weight: 600; color: #ffffff;">Hank</div>
+          </div>
+        </div>
 
-<!-- MAIN -->
-<div style="flex-grow: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px; padding: 56px 64px 64px 64px;">
+        <!-- MAIN -->
+        <div
+          style="flex-grow: 1;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 44px;
+            padding: 56px 64px 64px 64px;">
 
-<div style="display: flex; flex-direction: column; gap: 12px;">
-<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -0.02em;">Events</h1>
-</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <h1
+              style="margin: 0;
+                font-family: 'Instrument Serif', Georgia, serif;
+                font-weight: 400;
+                font-size: 56px;
+                line-height: 1;
+                letter-spacing: -0.02em;">Events</h1>
+          </div>
 
-<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px; align-items: start;">
+          <div
+            style="display: grid;
+              grid-template-columns: repeat(12, minmax(0, 1fr));
+              gap: 32px;
+              align-items: start;">
 
-<!-- List -->
-<div style="grid-column: span 6; display: flex; flex-direction: column; gap: 28px; padding: 36px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
-<div style="display: flex; gap: 8px; padding: 6px; background: #241c52; border-radius: 999px;">
-<sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
-<button type="button" onClick="{{ tab.pick }}" aria-pressed="{{ tab.active }}" style="{{ tab.style }}">{{ tab.label }}</button>
-</sc-for>
-</div>
-<div style="display: flex; flex-direction: column; gap: 16px;">
-<sc-for list="{{ events }}" as="ev" hint-placeholder-count="3">
-<button type="button" onClick="{{ ev.pick }}" aria-pressed="{{ ev.selected }}" style="{{ ev.rowStyle }}">
-<div style="{{ ev.dateStyle }}">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">{{ ev.day }}</div>
-<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 1;">{{ ev.date }}</div>
-</div>
-<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
-<div style="font-size: 20px; font-weight: 700;">{{ ev.title }}</div>
-<div style="font-size: 15px; color: #a9a3cf; line-height: 1.4;">{{ ev.meta }}</div>
-</div>
-<div style="{{ ev.pillStyle }}">{{ ev.pillLabel }}</div>
-</button>
-</sc-for>
-</div>
-</div>
+            <!-- List -->
+            <div
+              style="grid-column: span 6;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+                padding: 36px;
+                background: #161141;
+                border: 1px solid #2c2360;
+                border-radius: 28px;">
+              <div style="display: flex; gap: 8px; padding: 6px; background: #241c52; border-radius: 999px;">
+                <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
+                  <button
+                    type="button"
+                    onClick="{{ tab.pick }}"
+                    aria-pressed="{{ tab.active }}"
+                    style="{{ tab.style }}">{{ tab.label }}</button>
+                </sc-for>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <sc-for list="{{ events }}" as="ev" hint-placeholder-count="3">
+                  <button
+                    type="button"
+                    onClick="{{ ev.pick }}"
+                    aria-pressed="{{ ev.selected }}"
+                    style="{{ ev.rowStyle }}">
+                    <div style="{{ ev.dateStyle }}">
+                      <div
+                        style="font-size: 12px;
+                          font-weight: 700;
+                          letter-spacing: 0.1em;
+                          text-transform: uppercase;">{{ ev.day }}</div>
+                      <div
+                        style="font-family: 'Instrument Serif', Georgia, serif;
+                          font-size: 30px;
+                          line-height: 1;">{{ ev.date }}</div>
+                    </div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
+                      <div style="font-size: 20px; font-weight: 700;">{{ ev.title }}</div>
+                      <div style="font-size: 15px; color: #a9a3cf; line-height: 1.4;">{{ ev.meta }}</div>
+                    </div>
+                    <div style="{{ ev.pillStyle }}">{{ ev.pillLabel }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
 
-<!-- Detail -->
-<div style="grid-column: span 6; display: flex; flex-direction: column; gap: 32px; padding: 40px; background: #161141; border: 1px solid #2c2360; border-radius: 28px;">
-<div style="display: flex; flex-direction: column; gap: 14px;">
-<div style="{{ sel.pillStyle }}">{{ sel.pillLabel }}</div>
-<h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 42px; line-height: 1.05; letter-spacing: -0.015em;">{{ sel.title }}</h2>
-<div style="font-size: 17px; color: #a9a3cf;">{{ sel.meta }}</div>
-</div>
+            <!-- Detail -->
+            <div
+              style="grid-column: span 6;
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+                padding: 40px;
+                background: #161141;
+                border: 1px solid #2c2360;
+                border-radius: 28px;">
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="{{ sel.pillStyle }}">{{ sel.pillLabel }}</div>
+                <h2
+                  style="margin: 0;
+                    font-family: 'Instrument Serif', Georgia, serif;
+                    font-weight: 400;
+                    font-size: 42px;
+                    line-height: 1.05;
+                    letter-spacing: -0.015em;">{{ sel.title }}</h2>
+                <div style="font-size: 17px; color: #a9a3cf;">{{ sel.meta }}</div>
+              </div>
 
-<div style="display: flex; flex-direction: column; gap: 12px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.whoLabel }}</div>
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-<sc-for list="{{ sel.who }}" as="w" hint-placeholder-count="2">
-<div style="display: flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 999px; background: #2e2470; color: #b7a7ff; font-size: 15px; font-weight: 600;">{{ w.name }}</div>
-</sc-for>
-</div>
-</div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div
+                  style="font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    color: #b7a7ff;">{{ sel.whoLabel }}</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  <sc-for list="{{ sel.who }}" as="w" hint-placeholder-count="2">
+                    <div
+                      style="display: flex;
+                        align-items: center;
+                        height: 40px;
+                        padding: 0 16px;
+                        border-radius: 999px;
+                        background: #2e2470;
+                        color: #b7a7ff;
+                        font-size: 15px;
+                        font-weight: 600;">{{ w.name }}</div>
+                  </sc-for>
+                </div>
+              </div>
 
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.aLabel }}</div>
-<div style="font-size: 17px; line-height: 1.55;">{{ sel.aText }}</div>
-</div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div
+                  style="font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    color: #b7a7ff;">{{ sel.aLabel }}</div>
+                <div style="font-size: 17px; line-height: 1.55;">{{ sel.aText }}</div>
+              </div>
 
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.bLabel }}</div>
-<div style="font-size: 17px; line-height: 1.55;">{{ sel.bText }}</div>
-</div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div
+                  style="font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    color: #b7a7ff;">{{ sel.bLabel }}</div>
+                <div style="font-size: 17px; line-height: 1.55;">{{ sel.bText }}</div>
+              </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 24px; background: #241c52; border-radius: 20px;">
-<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ sel.listLabel }}</div>
-<sc-for list="{{ sel.items }}" as="it" hint-placeholder-count="2">
-<div style="padding: 16px 18px; background: #161141; border: 1px solid #3a3080; border-radius: 14px; font-size: 16px; line-height: 1.45;">{{ it.text }}</div>
-</sc-for>
-</div>
+              <div
+                style="display: flex;
+                  flex-direction: column;
+                  gap: 14px;
+                  padding: 24px;
+                  background: #241c52;
+                  border-radius: 20px;">
+                <div
+                  style="font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    color: #b7a7ff;">{{ sel.listLabel }}</div>
+                <sc-for list="{{ sel.items }}" as="it" hint-placeholder-count="2">
+                  <div
+                    style="padding: 16px 18px;
+                      background: #161141;
+                      border: 1px solid #3a3080;
+                      border-radius: 14px;
+                      font-size: 16px;
+                      line-height: 1.45;">{{ it.text }}</div>
+                </sc-for>
+              </div>
 
-<sc-if value="{{ sel.suggested }}" hint-placeholder-val="{{ false }}">
-<button type="button" onClick="{{ sel.toggleAdd }}" aria-pressed="{{ sel.added }}" style="{{ sel.addStyle }}">{{ sel.addLabel }}</button>
-</sc-if>
-</div>
+              <sc-if value="{{ sel.suggested }}" hint-placeholder-val="{{ false }}">
+                <button
+                  type="button"
+                  onClick="{{ sel.toggleAdd }}"
+                  aria-pressed="{{ sel.added }}"
+                  style="{{ sel.addStyle }}">{{ sel.addLabel }}</button>
+              </sc-if>
+            </div>
 
-</div>
-</div>
-</div>
-</x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
-class Component extends DCLogic {
-constructor(props) {
-super(props);
-this.state = { tab: 'up', sel: 'e1', added: { x1: false, x2: false } };
-}
-renderVals() {
-const st = this.state;
-const all = [
-{ id: 'e1', kind: 'up', day: 'Tue', date: '22', title: 'Founders & Friends Meetup', meta: 'Tue, Sep 22 · 6:30 pm · [Venue], [Neighborhood]', who: ['Priya Nair', 'Ana Ruiz', 'Maya Chen'], aLabel: 'Common ground', aText: 'You know Priya Nair from Demo Night, and two other people you have met are on the guest list.', bLabel: 'Recent context', bText: 'The host announced a lightning-talk slot this month.', listLabel: 'Good questions to ask', items: ['What are you building right now?', 'Who here should I be talking to?'] },
-{ id: 'e2', kind: 'up', day: 'Thu', date: '24', title: 'Coffee with Maya Chen', meta: 'Thu, Sep 24 · 3:30 pm · Corner Café', who: ['Maya Chen'], aLabel: 'Common ground', aText: 'You both organize small local meetups and care about onboarding for small teams.', bLabel: 'Recent context', bText: 'Maya recently posted about moving her team to a four-day week.', listLabel: 'Good questions to ask', items: ['What changed for you after the last launch?', 'Who else in the local scene should I be meeting?'] },
-{ id: 'e3', kind: 'up', day: 'Sat', date: '26', title: 'Climate Tech Demo Morning', meta: 'Sat, Sep 26 · 10:00 am · [Community hall]', who: ['Daniel Okafor'], aLabel: 'Common ground', aText: 'Three of the demoing teams match interests you saved last month.', bLabel: 'Recent context', bText: 'Daniel Okafor is listed as a speaker.', listLabel: 'Good questions to ask', items: ['What is the hardest part of getting your first customers?', 'What would you build next with more time?'] },
-{ id: 'x1', kind: 'sug', day: 'Wed', date: '30', title: 'Product People Happy Hour', meta: 'Wed, Sep 30 · 6:00 pm · [Venue]', who: ['Maya Chen', 'Priya Nair'], aLabel: 'Why it fits', aText: 'Your Wednesday evening is open, and the topics match what you follow.', bLabel: 'Who might be there', bText: 'People you already know have been to earlier editions.', listLabel: 'Worth bringing up', items: ['The onboarding article you plan to send Priya.', 'Your idea for a shared meetup calendar.'] },
-{ id: 'x2', kind: 'sug', day: 'Thu', date: '1', title: 'Design Systems Study Group', meta: 'Thu, Oct 1 · 12:15 pm · [Venue]', who: ['Sofia Lindqvist'], aLabel: 'Why it fits', aText: 'It is a short lunch slot near where you will be that day.', bLabel: 'Who might be there', bText: 'Sofia Lindqvist has hosted sessions like this before.', listLabel: 'Worth bringing up', items: ['Ask how the group shares work between meetings.'] },
-{ id: 'p0', kind: 'past', day: 'Thu', date: '27', title: 'Founders & Friends Meetup', meta: 'Thu, Aug 27 · [Venue], [Neighborhood]', who: ['Ana Ruiz'], aLabel: 'What you captured', aText: 'You met Ana, who runs the meetup. She asked to see your deck.', bLabel: 'Still open', bText: 'One follow-up is waiting on you.', listLabel: 'Follow-ups from this event', items: ['Share the deck with Ana'] },
-{ id: 'p1', kind: 'past', day: 'Sat', date: '5', title: 'Demo Night', meta: 'Sat, Sep 5 · [Venue]', who: ['Priya Nair'], aLabel: 'What you captured', aText: 'You met Priya and talked about onboarding for small teams. She asked to see the article you mentioned.', bLabel: 'Still open', bText: 'One follow-up is waiting on you.', listLabel: 'Follow-ups from this event', items: ['Send Priya the article on onboarding tools'] },
-{ id: 'p2', kind: 'past', day: 'Tue', date: '8', title: 'Coffee with Marcus Webb', meta: 'Tue, Sep 8 · [Café]', who: ['Marcus Webb'], aLabel: 'What you captured', aText: 'Marcus offered to introduce you to two founders and asked for a short summary of what you are building.', bLabel: 'Still open', bText: 'Your thank-you note is done. One introduction is still to make.', listLabel: 'Follow-ups from this event', items: ['Introduce Daniel to Sofia', 'Thank Marcus for the referral (done)'] }
-];
-const tabDefs = [
-{ id: 'up', label: 'Upcoming' },
-{ id: 'sug', label: 'Suggested' },
-{ id: 'past', label: 'Past' }
-];
-const firstOf = (k) => all.filter((e) => e.kind === k)[0].id;
-const tabs = tabDefs.map((t) => {
-const active = st.tab === t.id;
-return {
-label: t.label + ' (' + all.filter((e) => e.kind === t.id).length + ')',
-active: active,
-style: 'flex:1;min-height:48px;border:0;border-radius:999px;font-size:16px;font-weight:600;cursor:pointer;' + (active ? 'background:#5b3df5;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
-pick: () => this.setState({ tab: t.id, sel: firstOf(t.id) })
-};
-});
-const kindStyle = {
-up: { date: 'background:#5b3df5;color:#ffffff;', pill: 'background:#0d3d3a;color:#4be3c6;', label: 'Prep ready' },
-sug: { date: 'background:#14c8a8;color:#1a1440;', pill: 'background:#3d3210;color:#ffd86b;', label: 'Suggested' },
-past: { date: 'background:#cfc6fb;color:#1a1440;', pill: 'background:#2e2470;color:#b7a7ff;', label: 'Captured' }
-};
-const pillBase = 'display:flex;align-items:center;align-self:flex-start;height:36px;padding:0 16px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;';
-const shaped = (e) => {
-const ks = kindStyle[e.kind];
-const selected = st.sel === e.id;
-const added = !!st.added[e.id];
-return {
-...e,
-selected: selected,
-pillLabel: e.kind === 'sug' && added ? 'On your schedule' : ks.label,
-pillStyle: pillBase + ks.pill,
-dateStyle: 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:64px;height:64px;flex-shrink:0;border-radius:18px;' + ks.date,
-rowStyle: 'display:flex;align-items:center;gap:22px;width:100%;box-sizing:border-box;padding:22px 24px;text-align:left;cursor:pointer;color:#f3f0ff;border-radius:22px;background:' + (selected ? '#241c52' : '#1a1449') + ';border:2px solid ' + (selected ? '#5b3df5' : '#2a2360') + ';',
-pick: () => this.setState({ sel: e.id }),
-suggested: e.kind === 'sug',
-added: added,
-addLabel: added ? 'Added to your schedule' : 'Add to my schedule',
-addStyle: 'align-self:flex-start;min-height:52px;padding:0 28px;border-radius:999px;font-size:16px;font-weight:700;cursor:pointer;' + (added ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;'),
-toggleAdd: () => this.setState({ added: { ...st.added, [e.id]: !added } }),
-whoLabel: e.kind === 'past' ? 'People you met' : (e.kind === 'sug' ? 'People you know who may go' : 'People to meet'),
-who: e.who.map((n) => ({ name: n })),
-items: e.items.map((t) => ({ text: t }))
-};
-};
-const events = all.filter((e) => e.kind === st.tab).map(shaped);
-const sel = shaped(all.filter((e) => e.id === st.sel)[0] || all[0]);
-return { tabs: tabs, events: events, sel: sel };
-}
-}
-</script>
-</body>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+    <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+      class Component extends DCLogic {
+        constructor(props) {
+          super(props);
+          this.state = { tab: 'up', sel: 'e1', added: { x1: false, x2: false } };
+        }
+        renderVals() {
+          const st = this.state;
+          const all = [
+            { id: 'e1', kind: 'up', day: 'Tue', date: '22', title: 'Founders & Friends Meetup', meta: 'Tue, Sep 22 · 6:30 pm · [Venue], [Neighborhood]', who: ['Priya Nair', 'Ana Ruiz', 'Maya Chen'], aLabel: 'Common ground', aText: 'You know Priya Nair from Demo Night, and two other people you have met are on the guest list.', bLabel: 'Recent context', bText: 'The host announced a lightning-talk slot this month.', listLabel: 'Good questions to ask', items: ['What are you building right now?', 'Who here should I be talking to?'] },
+            { id: 'e2', kind: 'up', day: 'Thu', date: '24', title: 'Coffee with Maya Chen', meta: 'Thu, Sep 24 · 3:30 pm · Corner Café', who: ['Maya Chen'], aLabel: 'Common ground', aText: 'You both organize small local meetups and care about onboarding for small teams.', bLabel: 'Recent context', bText: 'Maya recently posted about moving her team to a four-day week.', listLabel: 'Good questions to ask', items: ['What changed for you after the last launch?', 'Who else in the local scene should I be meeting?'] },
+            { id: 'e3', kind: 'up', day: 'Sat', date: '26', title: 'Climate Tech Demo Morning', meta: 'Sat, Sep 26 · 10:00 am · [Community hall]', who: ['Daniel Okafor'], aLabel: 'Common ground', aText: 'Three of the demoing teams match interests you saved last month.', bLabel: 'Recent context', bText: 'Daniel Okafor is listed as a speaker.', listLabel: 'Good questions to ask', items: ['What is the hardest part of getting your first customers?', 'What would you build next with more time?'] },
+            { id: 'x1', kind: 'sug', day: 'Wed', date: '30', title: 'Product People Happy Hour', meta: 'Wed, Sep 30 · 6:00 pm · [Venue]', who: ['Maya Chen', 'Priya Nair'], aLabel: 'Why it fits', aText: 'Your Wednesday evening is open, and the topics match what you follow.', bLabel: 'Who might be there', bText: 'People you already know have been to earlier editions.', listLabel: 'Worth bringing up', items: ['The onboarding article you plan to send Priya.', 'Your idea for a shared meetup calendar.'] },
+            { id: 'x2', kind: 'sug', day: 'Thu', date: '1', title: 'Design Systems Study Group', meta: 'Thu, Oct 1 · 12:15 pm · [Venue]', who: ['Sofia Lindqvist'], aLabel: 'Why it fits', aText: 'It is a short lunch slot near where you will be that day.', bLabel: 'Who might be there', bText: 'Sofia Lindqvist has hosted sessions like this before.', listLabel: 'Worth bringing up', items: ['Ask how the group shares work between meetings.'] },
+            { id: 'p0', kind: 'past', day: 'Thu', date: '27', title: 'Founders & Friends Meetup', meta: 'Thu, Aug 27 · [Venue], [Neighborhood]', who: ['Ana Ruiz'], aLabel: 'What you captured', aText: 'You met Ana, who runs the meetup. She asked to see your deck.', bLabel: 'Still open', bText: 'One follow-up is waiting on you.', listLabel: 'Follow-ups from this event', items: ['Share the deck with Ana'] },
+            { id: 'p1', kind: 'past', day: 'Sat', date: '5', title: 'Demo Night', meta: 'Sat, Sep 5 · [Venue]', who: ['Priya Nair'], aLabel: 'What you captured', aText: 'You met Priya and talked about onboarding for small teams. She asked to see the article you mentioned.', bLabel: 'Still open', bText: 'One follow-up is waiting on you.', listLabel: 'Follow-ups from this event', items: ['Send Priya the article on onboarding tools'] },
+            { id: 'p2', kind: 'past', day: 'Tue', date: '8', title: 'Coffee with Marcus Webb', meta: 'Tue, Sep 8 · [Café]', who: ['Marcus Webb'], aLabel: 'What you captured', aText: 'Marcus offered to introduce you to two founders and asked for a short summary of what you are building.', bLabel: 'Still open', bText: 'Your thank-you note is done. One introduction is still to make.', listLabel: 'Follow-ups from this event', items: ['Introduce Daniel to Sofia', 'Thank Marcus for the referral (done)'] }
+          ];
+          const tabDefs = [
+            { id: 'up', label: 'Upcoming' },
+            { id: 'sug', label: 'Suggested' },
+            { id: 'past', label: 'Past' }
+          ];
+          const firstOf = (k) => all.filter((e) => e.kind === k)[0].id;
+          const tabs = tabDefs.map((t) => {
+            const active = st.tab === t.id;
+            return {
+              label: t.label + ' (' + all.filter((e) => e.kind === t.id).length + ')',
+              active: active,
+              style: 'flex:1;min-height:48px;border:0;border-radius:999px;font-size:16px;font-weight:600;cursor:pointer;' + (active ? 'background:#5b3df5;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
+              pick: () => this.setState({ tab: t.id, sel: firstOf(t.id) })
+            };
+          });
+          const kindStyle = {
+            up: { date: 'background:#5b3df5;color:#ffffff;', pill: 'background:#0d3d3a;color:#4be3c6;', label: 'Prep ready' },
+            sug: { date: 'background:#14c8a8;color:#1a1440;', pill: 'background:#3d3210;color:#ffd86b;', label: 'Suggested' },
+            past: { date: 'background:#cfc6fb;color:#1a1440;', pill: 'background:#2e2470;color:#b7a7ff;', label: 'Captured' }
+          };
+          const pillBase = 'display:flex;align-items:center;align-self:flex-start;height:36px;padding:0 16px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;';
+          const shaped = (e) => {
+            const ks = kindStyle[e.kind];
+            const selected = st.sel === e.id;
+            const added = !!st.added[e.id];
+            return {
+              ...e,
+              selected: selected,
+              pillLabel: e.kind === 'sug' && added ? 'On your schedule' : ks.label,
+              pillStyle: pillBase + ks.pill,
+              dateStyle: 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:64px;height:64px;flex-shrink:0;border-radius:18px;' + ks.date,
+              rowStyle: 'display:flex;align-items:center;gap:22px;width:100%;box-sizing:border-box;padding:22px 24px;text-align:left;cursor:pointer;color:#f3f0ff;border-radius:22px;background:' + (selected ? '#241c52' : '#1a1449') + ';border:2px solid ' + (selected ? '#5b3df5' : '#2a2360') + ';',
+              pick: () => this.setState({ sel: e.id }),
+              suggested: e.kind === 'sug',
+              added: added,
+              addLabel: added ? 'Added to your schedule' : 'Add to my schedule',
+              addStyle: 'align-self:flex-start;min-height:52px;padding:0 28px;border-radius:999px;font-size:16px;font-weight:700;cursor:pointer;' + (added ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#5b3df5;color:#ffffff;border:2px solid #5b3df5;'),
+              toggleAdd: () => this.setState({ added: { ...st.added, [e.id]: !added } }),
+              whoLabel: e.kind === 'past' ? 'People you met' : (e.kind === 'sug' ? 'People you know who may go' : 'People to meet'),
+              who: e.who.map((n) => ({ name: n })),
+              items: e.items.map((t) => ({ text: t }))
+            };
+          };
+          const events = all.filter((e) => e.kind === st.tab).map(shaped);
+          const sel = shaped(all.filter((e) => e.id === st.sel)[0] || all[0]);
+          return { tabs: tabs, events: events, sel: sel };
+        }
+      }
+    </script>
+  </body>
 </html>
+
