@@ -43,6 +43,12 @@ button{font-family:inherit}
 .nm-edge{transition:opacity .4s ease}
 .nm-q{transition:background .2s ease}
 .nm-q:hover{background:#2e2470}
+.nm-mini{transition:opacity .4s ease}
+.nm-mini .nm-mav{transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s ease}
+.nm-mini:hover .nm-mav{transform:scale(1.15);box-shadow:0 0 0 4px rgba(255,201,60,.35)}
+.nm-row{transition:background .2s ease,border-color .2s ease}
+.nm-row:hover{background:#241c52;border-color:#5b3df5}
+@keyframes nm-fan{from{opacity:0;transform:translate(var(--fx),var(--fy)) scale(.4)}to{opacity:1;transform:translate(0,0) scale(1)}}
 </style>
 </helmet>
 <div style="width: 1440px; height: 100vh; min-height: 860px; box-sizing: border-box; display: flex; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
@@ -70,11 +76,21 @@ button{font-family:inherit}
 
 <!-- Header: title + lens switch -->
 <div style="display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-shrink: 0;">
+<div style="display: flex; align-items: center; gap: 20px;">
 <h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 48px; line-height: 1; letter-spacing: -0.02em;">People</h1>
+<div style="display: flex; align-items: center; height: 34px; padding: 0 14px; border-radius: 999px; background: #161141; border: 1px solid #2c2360; font-size: 14px; font-weight: 600; color: #cdc6ee; white-space: nowrap;">{{ countLine }}</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="display: flex; flex-shrink: 0; gap: 4px; padding: 4px; background: #161141; border: 1px solid #2c2360; border-radius: 999px;">
+<sc-for list="{{ views }}" as="v" hint-placeholder-count="2">
+<button type="button" onClick="{{ v.pick }}" aria-pressed="{{ v.active }}" style="{{ v.style }}">{{ v.label }}</button>
+</sc-for>
+</div>
 <div style="display: flex; flex-shrink: 0; gap: 6px; padding: 6px; background: #161141; border: 1px solid #2c2360; border-radius: 999px;">
 <sc-for list="{{ lenses }}" as="l" hint-placeholder-count="3">
 <button type="button" onClick="{{ l.pick }}" aria-pressed="{{ l.active }}" style="{{ l.style }}">{{ l.label }}</button>
 </sc-for>
+</div>
 </div>
 </div>
 
@@ -87,15 +103,16 @@ button{font-family:inherit}
 <div style="position: absolute; right: -160px; bottom: -160px; width: 520px; height: 520px; border-radius: 999px; background: radial-gradient(circle, rgba(20,200,168,0.14) 0%, rgba(20,200,168,0) 62%); pointer-events: none;"></div>
 
 <!-- Legend -->
-<div style="position: absolute; right: 20px; top: 18px; z-index: 5; display: flex; align-items: center; gap: 18px; height: 34px; padding: 0 16px; background: rgba(13,10,36,0.8); border: 1px solid #2c2360; border-radius: 999px; font-size: 13px; font-weight: 600; color: #cdc6ee; white-space: nowrap;">
+<div style="{{ legendStyle }}">
 <div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #ffc93c;"></div>You</div>
-<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #5b3df5;"></div>Person</div>
-<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #14c8a8;"></div>Event</div>
-<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 999px; background: #b7a7ff;"></div>Topic</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 12px; height: 12px; border-radius: 999px; background: #5b3df5;"></div>Act on this week</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 8px; height: 8px; border-radius: 999px; background: #5b3df5; opacity: .7;"></div>Warm</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 11px; height: 11px; border-radius: 999px; border: 1px dashed #b7a7ff;"></div>Group</div>
+<div style="display: flex; align-items: center; gap: 7px;"><div style="width: 10px; height: 10px; border-radius: 3px; background: #14c8a8;"></div>Event</div>
 </div>
 
 <!-- SCENE (design size 1062x940, scaled by --u) -->
-<div class="nm-scene">
+<div class="nm-scene" style="{{ sceneStyle }}">
 <!-- WORLD (pans and zooms toward the selection) -->
 <div class="nm-world" style="{{ worldStyle }}">
 
@@ -111,9 +128,33 @@ button{font-family:inherit}
 <div class="nm-edge" style="{{ e.labelStyle }}">{{ e.label }}</div>
 </sc-for>
 
-<!-- Topic chips -->
-<sc-for list="{{ chips }}" as="c" hint-placeholder-count="12">
-<div class="nm-chip" style="{{ c.style }}">{{ c.text }}</div>
+<!-- Warm contacts (compact) -->
+<sc-for list="{{ minis }}" as="m" hint-placeholder-count="7">
+<button class="nm-mini" type="button" onClick="{{ m.pick }}" aria-pressed="{{ m.selected }}" style="{{ m.style }}">
+<div class="nm-mav" style="{{ m.avStyle }}">{{ m.initials }}</div>
+<div style="font-size: calc(12 * var(--u)); font-weight: 700; line-height: 1.2;">{{ m.name }}</div>
+<div style="{{ m.tagStyle }}">{{ m.tag }}</div>
+</button>
+</sc-for>
+
+<!-- Groups (collapsed people) -->
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+<button class="nm-mini" type="button" onClick="{{ g.pick }}" aria-pressed="{{ g.selected }}" style="{{ g.style }}">
+<div class="nm-mav" style="{{ g.avStyle }}">
+<div style="display: flex; margin-bottom: calc(2 * var(--u));"><div style="width: calc(9 * var(--u)); height: calc(9 * var(--u)); border-radius: 999px; background: #b7a7ff;"></div><div style="width: calc(9 * var(--u)); height: calc(9 * var(--u)); margin-left: calc(-3 * var(--u)); border-radius: 999px; background: #8f7cf5;"></div><div style="width: calc(9 * var(--u)); height: calc(9 * var(--u)); margin-left: calc(-3 * var(--u)); border-radius: 999px; background: #5b3df5;"></div></div>
+<div style="font-size: calc(13 * var(--u)); font-weight: 700;">{{ g.count }}</div>
+</div>
+<div style="font-size: calc(12 * var(--u)); font-weight: 700; line-height: 1.2;">{{ g.name }}</div>
+<div style="{{ g.tagStyle }}">{{ g.tag }}</div>
+</button>
+</sc-for>
+
+<!-- Expanded group members -->
+<sc-for list="{{ members }}" as="m" hint-placeholder-count="3">
+<button class="nm-mini" type="button" onClick="{{ m.pick }}" aria-pressed="{{ m.selected }}" style="{{ m.style }}">
+<div class="nm-mav" style="{{ m.avStyle }}">{{ m.initials }}</div>
+<div style="font-size: calc(12 * var(--u)); font-weight: 700; line-height: 1.2;">{{ m.name }}</div>
+</button>
 </sc-for>
 
 <!-- Event nodes -->
@@ -161,8 +202,74 @@ Goal: 5 design partners
 </div>
 </div>
 
+<!-- LIST VIEW -->
+<sc-if value="{{ showList }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; overflow-y: auto; box-sizing: border-box; padding: 28px 28px 28px 28px; display: flex; flex-direction: column; gap: 28px;">
+<sc-for list="{{ listSections }}" as="sec" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; align-items: baseline; gap: 12px;">
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 26px; line-height: 1;">{{ sec.title }}</div>
+<div style="font-size: 14px; color: #a9a3cf;">{{ sec.sub }}</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+<sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="4">
+<button class="nm-row" type="button" onClick="{{ r.pick }}" aria-pressed="{{ r.selected }}" style="{{ r.style }}">
+<div style="{{ r.avStyle }}">{{ r.initials }}</div>
+<div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+<div style="display: flex; align-items: center; gap: 10px;"><div style="font-size: 16px; font-weight: 700;">{{ r.name }}</div><div style="{{ r.pillStyle }}">{{ r.pill }}</div></div>
+<div style="font-size: 13px; color: #a9a3cf;">{{ r.role }}</div>
+<div style="font-size: 14px; line-height: 1.4; color: #e4defc;">{{ r.line }}</div>
+</div>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
 <!-- Dim veil when a panel is open -->
 <div style="{{ veilStyle }}"></div>
+
+<!-- GROUP PANEL -->
+<sc-if value="{{ showGroup }}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; top: 0; right: 0; bottom: 0; z-index: 10; width: 500px; box-sizing: border-box; display: flex; flex-direction: column; background: #120c38; border-left: 1px solid #3a3080; box-shadow: -40px 0 80px -30px rgba(0,0,0,0.7); animation: nm-slide .5s cubic-bezier(.2,.8,.2,1) both;">
+<div style="flex-grow: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 24px 28px 28px 28px;">
+<button type="button" onClick="{{ back }}" style="display: flex; align-items: center; gap: 8px; align-self: flex-start; height: 36px; padding: 0 12px 0 6px; border: 0; border-radius: 999px; background: transparent; color: #b7a7ff; font-size: 15px; font-weight: 600; cursor: pointer;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b7a7ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+Back to network
+</button>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; align-self: flex-start; height: 32px; padding: 0 14px; border-radius: 999px; background: #2e2470; color: #d3c9ff; font-size: 13px; font-weight: 700;">Group · {{ g.count }} people</div>
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 36px; line-height: 1.05; letter-spacing: -0.01em;">{{ g.name }}</div>
+<div style="font-size: 15px; color: #a9a3cf;">{{ g.via }}</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; background: #2e2470; border-radius: 16px;">
+<div style="font-size: 15px; font-weight: 700; color: #d3c9ff;">Why they are grouped</div>
+<div style="font-size: 15px; line-height: 1.5;">{{ g.why }}</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">People in this group</div>
+<sc-for list="{{ g.people }}" as="w" hint-placeholder-count="4">
+<button type="button" onClick="{{ w.pick }}" style="display: flex; align-items: center; gap: 14px; width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #2c2360; border-radius: 14px; background: #161141; color: #f3f0ff; text-align: left; cursor: pointer;">
+<div style="{{ w.avStyle }}">{{ w.initials }}</div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;">
+<div style="font-size: 15px; font-weight: 700;">{{ w.name }}</div>
+<div style="font-size: 13px; color: #a9a3cf;">{{ w.note }}</div>
+</div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b7a7ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+</sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 16px 28px 20px 28px; border-top: 1px solid #2c2360; background: #120c38;">
+<button type="button" onClick="{{ g.togglePromote }}" aria-pressed="{{ g.promoted }}" style="{{ g.promoteStyle }}">{{ g.promoteLabel }}</button>
+<a href="Events.dc.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border-radius: 999px; border: 2px solid #5b3df5; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none;">{{ g.ctaLabel }}
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+</a>
+</div>
+</div>
+</sc-if>
 
 <!-- PERSON PANEL -->
 <sc-if value="{{ showPerson }}" hint-placeholder-val="{{ true }}">
@@ -332,293 +439,245 @@ Back to network
 class Component extends DCLogic {
 constructor(props) {
 super(props);
-this.state = { lens: 'goal', sel: null, gen: 0, intro: true, relens: false, done: {}, added: {} };
+this.state = { lens: 'goal', view: 'map', sel: null, open: null, gen: 0, intro: true, relens: false, done: {}, added: {}, promoted: {} };
 }
 renderVals() {
 const st = this.state;
-const W = 1062, H = 940;
-const CX = 531, CY = 470;
-const R1 = 198, R2 = 396;
+const W = 1062, H = 940, CX = 531, CY = 470, R1 = 285, R2 = 400, R3 = 462;
 const go = (patch) => this.setState({ ...patch, intro: false });
-const tones = [
-{ bg: '#5b3df5', fg: '#ffffff' },
-{ bg: '#ff5a4e', fg: '#1a1440' },
-{ bg: '#14c8a8', fg: '#1a1440' },
-{ bg: '#ffc93c', fg: '#1a1440' }
-];
-const initials = (n) => n.split(' ').map((w) => w[0]).join('');
-
-// ---------- Data ----------
-const peopleData = [
-{ id: 'maya', x: 250, y: 185, tone: 2, name: 'Maya Chen', role: 'Head of growth, [Company]', pill: 'Coffee chat (Thu)', pillKind: 'warm', status: 'Coffee on Thursday', calLabel: 'View in calendar',
-whyTitle: 'Why you should talk to Maya', why: 'Maya runs growth for a small team that is exactly the profile you want as a design partner. You already have coffee on Thursday, and she is on Tuesday\'s guest list, so you can turn one meeting into two touchpoints.',
-common: ['Onboarding', 'Small teams', 'Local meetups', 'Growth loops'],
-bring: ['Your onboarding research on small teams', 'An intro to Priya, who she has met once', 'Your shared meetup calendar idea'],
-learn: ['How her team evaluates new tools', 'What broke when they moved to a four-day week', 'Whether growth would sponsor a pilot'],
-questions: ['What was the last tool your team adopted, and who pushed for it?', 'If you piloted an onboarding tool, what would you need to see in 30 days?', 'Who else in growth should I be talking to locally?'] },
-{ id: 'priya', x: 812, y: 185, tone: 0, name: 'Priya Nair', role: 'Product designer, [Company]', pill: 'Follow-up due', pillKind: 'hot', status: 'In your network', calLabel: 'View in calendar',
-whyTitle: 'Why you should talk to Priya', why: 'Priya designs onboarding for small teams and asked for your article at Demo Night. That is an open door to a design-partner conversation, and she will be at Tuesday\'s meetup.',
-common: ['Onboarding', 'Small teams', 'Demo Night', 'Tuesday meetup'],
-bring: ['The onboarding article she asked for', 'Your small-team research notes', 'An intro to Maya\'s growth team'],
-learn: ['How her team evaluates new tools', 'What a design-partner deal needs to include', 'Who else at [Company] cares about onboarding'],
-questions: ['When you redesigned onboarding, what did you wish you had measured earlier?', 'What would make a design partnership worth your team\'s time?', 'Who at [Company] decides which tools get piloted?'] },
-{ id: 'marcus', x: 135, y: 470, tone: 1, name: 'Marcus Webb', role: 'Angel investor', pill: 'Intro promised', pillKind: 'warm', status: 'In your network', calLabel: 'Schedule',
-whyTitle: 'Why you should talk to Marcus', why: 'Marcus backs early local teams and offered to introduce you to two founders. He also knows Daniel and Sofia, so he is the shortest route to both of them.',
-common: ['Early-stage teams', 'Local founders', 'Coffee on Sep 8'],
-bring: ['A one-paragraph summary of what you are building', 'The Daniel-to-Sofia intro you promised', 'Progress since your coffee'],
-learn: ['Which of his founders need better onboarding', 'What he wants to see before a pre-seed check', 'Who else angels locally'],
-questions: ['Which of your portfolio teams struggles most with onboarding new users?', 'What would you want to see from me in the next 60 days?', 'Who else locally writes early checks?'] },
-{ id: 'ana', x: 927, y: 470, tone: 2, name: 'Ana Ruiz', role: 'Community organizer', pill: 'Deck requested', pillKind: 'hot', status: 'In your network', calLabel: 'View in calendar',
-whyTitle: 'Why you should talk to Ana', why: 'Ana runs the Founders & Friends meetup and knows most of the people on this map. She asked to see your deck, which is a chance to be introduced to the room instead of working it alone.',
-common: ['Founders & Friends', 'Community building', 'Local scene'],
-bring: ['Your deck, which she asked for', 'A lightning-talk pitch for this month\'s slot', 'Help with the meetup sign-up flow'],
-learn: ['Which regulars are small-team founders', 'Whether she would host a design-partner night', 'Who is new to the scene this month'],
-questions: ['Which regulars would you introduce me to if I only had time for three?', 'Would a five-minute lightning talk on onboarding fit this month?', 'What do most first-time attendees get wrong?'] },
-{ id: 'sofia', x: 250, y: 755, tone: 0, name: 'Sofia Lindqvist', role: 'Community lead, [Organization]', pill: 'Suggested', pillKind: 'cool', status: 'Suggested', calLabel: 'Schedule',
-whyTitle: 'Why you should meet Sofia', why: 'Sofia hosts a monthly dinner for community builders near you. You promised to introduce her to Daniel, so the first conversation already has a reason.',
-common: ['Community dinners', 'Ana\'s circle', 'Marcus\'s circle'],
-bring: ['The intro to Daniel you promised', 'A seat swap: invite her to Tuesday\'s meetup', 'Your shared meetup calendar idea'],
-learn: ['Who attends her dinners', 'Whether a dinner could host design partners', 'How she keeps a community engaged'],
-questions: ['Who at your dinners is building for small teams?', 'What would make a dinner about onboarding worth hosting?', 'How did you get your first twenty regulars?'] },
-{ id: 'daniel', x: 812, y: 755, tone: 3, name: 'Daniel Okafor', role: 'Engineer turned founder', pill: 'Suggested', pillKind: 'cool', status: 'Suggested', calLabel: 'Add to prep',
-whyTitle: 'Why you should meet Daniel', why: 'Daniel is speaking at Saturday\'s demo morning and builds the climate tooling you told your companion you were curious about. Marcus knows him, so a warm intro is one message away.',
-common: ['Climate tooling', 'Marcus\'s circle', 'Demo Morning'],
-bring: ['The intro to Sofia you promised', 'A question about his talk', 'Your onboarding notes for developer tools'],
-learn: ['How he onboarded his first users', 'Whether his team needs an onboarding partner', 'What the climate scene needs'],
-questions: ['What is the hardest part of getting your first customers?', 'How do new users get set up today, and where do they drop off?', 'What would you build next with more time?'] }
-];
-const eventData = [
-{ id: 'meetup', x: 531, y: 92, title: 'Founders & Friends Meetup', meta: 'Tue, Sep 22 · 6:30 pm · [Venue]', metaLong: 'Tue, Sep 22 · 6:30 to 9:00 pm · [Venue], [Neighborhood]', tag: '3 people you know', who: ['priya', 'ana', 'maya'], whoNotes: { priya: 'Owes her the article. Pick the thread back up.', ana: 'Runs the room. Ask for three introductions.', maya: 'Say hello, so Thursday\'s coffee is warm.' },
-why: 'Three people on this map will be in one room, and Ana can introduce you to small-team founders you have not met yet. This is the densest hour of your week for design-partner conversations.',
-steps: ['Arrive early and find Ana. Ask who she would introduce you to.', 'Find Priya and hand her the article in person.', 'Say hello to Maya, then leave her a reason to continue on Thursday.'] },
-{ id: 'demo', x: 531, y: 848, title: 'Climate Tech Demo Morning', meta: 'Sat, Sep 26 · 10:00 am · [Community hall]', metaLong: 'Sat, Sep 26 · 10:00 am to 12:30 pm · [Community hall]', tag: 'Daniel is speaking', who: ['daniel'], whoNotes: { daniel: 'Speaking. Ask one question after his talk.' },
-why: 'Three demoing teams match interests you saved last month, and Daniel is speaking. Early climate teams are exactly the kind of small team that needs onboarding help.',
-steps: ['Sit near the front for Daniel\'s talk and note one specific question.', 'Visit the three demo tables your companion flagged.', 'Mention Marcus when you introduce yourself to Daniel.'] }
-];
-// side: 'l' clusters are right-aligned to x=190, 'r' clusters start at x=872
-const chipData = [
-{ who: 'maya', side: 'l', text: 'Onboarding for small teams', y: 130 }, { who: 'maya', side: 'l', text: 'Growth loops', y: 172 }, { who: 'maya', side: 'l', text: 'Four-day week', y: 214 },
-{ who: 'priya', side: 'r', text: 'Onboarding UX', y: 130 }, { who: 'priya', side: 'r', text: 'Small-team tooling', y: 172 }, { who: 'priya', side: 'r', text: 'Design partnerships', y: 214 },
-{ who: 'sofia', side: 'l', text: 'Community dinners', y: 700 }, { who: 'sofia', side: 'l', text: 'Local organizers', y: 742 }, { who: 'sofia', side: 'l', text: 'Monthly, near you', y: 784 },
-{ who: 'daniel', side: 'r', text: 'Climate tooling', y: 700 }, { who: 'daniel', side: 'r', text: 'Developer onboarding', y: 742 }, { who: 'daniel', side: 'r', text: 'First customers', y: 784 }
-];
-const byId = {};
-peopleData.forEach((p) => { byId[p.id] = { x: p.x, y: p.y }; });
-eventData.forEach((e) => { byId[e.id] = { x: e.x, y: e.y }; });
-byId.me = { x: CX, y: CY };
-
-// ---------- Lenses ----------
-const lensDefs = {
-goal: {
-label: 'Paths to your goal',
-hint: 'Say hello to Maya on Tuesday, so Thursday\'s coffee is already a design-partner conversation.',
-edges: [
-{ a: 'me', b: 'maya', label: 'Design partner candidate', t: 0.5 },
-{ a: 'me', b: 'priya', label: 'Warmest lead · article owed', t: 0.5 },
-{ a: 'me', b: 'marcus', label: 'Route to Daniel and Sofia', t: 0.5 },
-{ a: 'me', b: 'ana', label: 'Knows the whole room', t: 0.5 },
-{ a: 'me', b: 'sofia', label: 'Intro promised', t: 0.66 },
-{ a: 'me', b: 'daniel', label: 'Ask after his talk', t: 0.66 },
-{ a: 'me', b: 'meetup', label: '3 people you know are going', t: 0.52 },
-{ a: 'me', b: 'demo', label: 'Daniel is speaking', t: 0.8 }
-]
-},
-who: {
-label: 'Who knows whom',
-hint: 'Ana can introduce you to Priya, Sofia, and Marcus in one evening. Ask her first.',
-edges: [
-{ a: 'ana', b: 'priya', label: 'Both at Founders & Friends', t: 0.36 },
-{ a: 'ana', b: 'sofia', label: 'Organizer circle', t: 0.22 },
-{ a: 'marcus', b: 'sofia', label: 'Marcus can introduce', t: 0.62 },
-{ a: 'marcus', b: 'daniel', label: 'Marcus knows him', t: 0.22 },
-{ a: 'priya', b: 'maya', label: 'Met once', t: 0.5 },
-{ a: 'me', b: 'marcus', label: 'Coffee, Sep 8', t: 0.5 },
-{ a: 'me', b: 'ana', label: 'Met Aug 27', t: 0.5 }
-]
-},
-where: {
-label: 'Where you\'ll meet them',
-hint: 'Tuesday covers three people. Saturday covers Daniel. Sofia still needs an intro from Marcus.',
-edges: [
-{ a: 'meetup', b: 'priya', label: '', t: 0.5 },
-{ a: 'meetup', b: 'ana', label: 'Tue · hosting', t: 0.7 },
-{ a: 'meetup', b: 'maya', label: '', t: 0.5 },
-{ a: 'demo', b: 'daniel', label: '', t: 0.5 },
-{ a: 'me', b: 'maya', label: 'Coffee, Thu 3:30 pm', t: 0.5 },
-{ a: 'me', b: 'meetup', label: 'You are going', t: 0.52 },
-{ a: 'me', b: 'demo', label: 'On your plan', t: 0.8 }
-]
-}
-};
-const lens = lensDefs[st.lens];
-const sel = st.sel;
-const intro = st.intro;
-const drawing = intro || st.relens;
-const draw = st.gen % 2 === 0 ? 'nm-draw-a' : 'nm-draw-b';
-
-const lenses = ['goal', 'who', 'where'].map((id) => {
-const active = st.lens === id;
-return {
-label: lensDefs[id].label,
-active: active,
-style: 'height:42px;padding:0 20px;border:0;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;' + (active ? 'background:#5b3df5;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
-pick: () => go({ lens: id, sel: null, gen: st.gen + 1, relens: true })
-};
-});
-
-// ---------- Scene helpers (design px -> scaled units) ----------
 const U = (n) => 'calc(' + Number(n).toFixed(1) + ' * var(--u))';
 const box = (x, y, w, h) => 'left:' + U(x) + ';top:' + U(y) + ';width:' + U(w) + ';height:' + U(h) + ';';
+const pol = (deg, r) => ({ x: CX + r * Math.cos(deg * Math.PI / 180), y: CY + r * Math.sin(deg * Math.PI / 180) });
+const tones = [{ bg: '#5b3df5', fg: '#ffffff' }, { bg: '#ff5a4e', fg: '#1a1440' }, { bg: '#14c8a8', fg: '#1a1440' }, { bg: '#ffc93c', fg: '#1a1440' }];
+const initials = (n) => n.split(' ').map((w) => w[0]).join('');
+const Q = (a, b) => [a, b];
 
-// ---------- Glow, sweep, orbits ----------
+// ---------- Data: inner ring (act this week) ----------
+const inner = [
+{ id: 'ana', a: 0, tone: 2, name: 'Ana Ruiz', role: 'Community organizer', pill: 'Deck requested', pillKind: 'hot', status: 'In your network', calLabel: 'View in calendar', whyTitle: 'Why you should talk to Ana', why: 'Ana runs the Founders & Friends meetup and knows most of the people on this map. She asked to see your deck, which is a chance to be introduced to the room instead of working it alone.', common: ['Founders & Friends', 'Community building', 'Local scene'], bring: ['Your deck, which she asked for', 'A lightning-talk pitch for this month\'s slot', 'Help with the meetup sign-up flow'], learn: ['Which regulars are small-team founders', 'Whether she would host a design-partner night', 'Who is new to the scene this month'], questions: ['Which regulars would you introduce me to if I only had time for three?', 'Would a five-minute lightning talk on onboarding fit this month?', 'What do most first-time attendees get wrong?'] },
+{ id: 'daniel', a: 60, tone: 3, name: 'Daniel Okafor', role: 'Engineer turned founder', pill: 'Suggested', pillKind: 'cool', status: 'Suggested', calLabel: 'Add to prep', whyTitle: 'Why you should meet Daniel', why: 'Daniel is speaking at Saturday\'s demo morning and builds the climate tooling you told your companion you were curious about. Marcus knows him, so a warm intro is one message away.', common: ['Climate tooling', 'Marcus\'s circle', 'Demo Morning'], bring: ['The intro to Sofia you promised', 'A question about his talk', 'Your onboarding notes for developer tools'], learn: ['How he onboarded his first users', 'Whether his team needs an onboarding partner', 'What the climate scene needs'], questions: ['What is the hardest part of getting your first customers?', 'How do new users get set up today, and where do they drop off?', 'What would you build next with more time?'] },
+{ id: 'sofia', a: 120, tone: 0, name: 'Sofia Lindqvist', role: 'Community lead, [Organization]', pill: 'Suggested', pillKind: 'cool', status: 'Suggested', calLabel: 'Schedule', whyTitle: 'Why you should meet Sofia', why: 'Sofia hosts a monthly dinner for community builders near you. You promised to introduce her to Daniel, so the first conversation already has a reason.', common: ['Community dinners', 'Ana\'s circle', 'Marcus\'s circle'], bring: ['The intro to Daniel you promised', 'An invite to Tuesday\'s meetup', 'Your shared meetup calendar idea'], learn: ['Who attends her dinners', 'Whether a dinner could host design partners', 'How she keeps a community engaged'], questions: ['Who at your dinners is building for small teams?', 'What would make a dinner about onboarding worth hosting?', 'How did you get your first twenty regulars?'] },
+{ id: 'marcus', a: 180, tone: 1, name: 'Marcus Webb', role: 'Angel investor', pill: 'Intro promised', pillKind: 'warm', status: 'In your network', calLabel: 'Schedule', whyTitle: 'Why you should talk to Marcus', why: 'Marcus backs early local teams and offered to introduce you to two founders. He also knows Daniel and Sofia, so he is the shortest route to both of them.', common: ['Early-stage teams', 'Local founders', 'Coffee on Sep 8'], bring: ['A one-paragraph summary of what you are building', 'The Daniel-to-Sofia intro you promised', 'Progress since your coffee'], learn: ['Which of his founders need better onboarding', 'What he wants to see before a pre-seed check', 'Who else angels locally'], questions: ['Which of your portfolio teams struggles most with onboarding new users?', 'What would you want to see from me in the next 60 days?', 'Who else locally writes early checks?'] },
+{ id: 'maya', a: 240, tone: 2, name: 'Maya Chen', role: 'Head of growth, [Company]', pill: 'Coffee chat (Thu)', pillKind: 'warm', status: 'Coffee on Thursday', calLabel: 'View in calendar', whyTitle: 'Why you should talk to Maya', why: 'Maya runs growth for a small team that is exactly the profile you want as a design partner. You already have coffee on Thursday, and she is on Tuesday\'s guest list, so you can turn one meeting into two touchpoints.', common: ['Onboarding', 'Small teams', 'Local meetups', 'Growth loops'], bring: ['Your onboarding research on small teams', 'An intro to Priya, who she has met once', 'Your shared meetup calendar idea'], learn: ['How her team evaluates new tools', 'What broke when they moved to a four-day week', 'Whether growth would sponsor a pilot'], questions: ['What was the last tool your team adopted, and who pushed for it?', 'If you piloted an onboarding tool, what would you need to see in 30 days?', 'Who else in growth should I be talking to locally?'] },
+{ id: 'priya', a: 300, tone: 0, name: 'Priya Nair', role: 'Product designer, [Company]', pill: 'Follow-up due', pillKind: 'hot', status: 'In your network', calLabel: 'View in calendar', whyTitle: 'Why you should talk to Priya', why: 'Priya designs onboarding for small teams and asked for your article at Demo Night. That is an open door to a design-partner conversation, and she will be at Tuesday\'s meetup.', common: ['Onboarding', 'Small teams', 'Demo Night', 'Tuesday meetup'], bring: ['The onboarding article she asked for', 'Your small-team research notes', 'An intro to Maya\'s growth team'], learn: ['How her team evaluates new tools', 'What a design-partner deal needs to include', 'Who else at [Company] cares about onboarding'], questions: ['When you redesigned onboarding, what did you wish you had measured earlier?', 'What would make a design partnership worth your team\'s time?', 'Who at [Company] decides which tools get piloted?'] }
+];
+// ---------- Data: warm ring (compact), each anchored to who or what reaches them ----------
+const warm = [
+{ id: 'leo', a: 315, via: 'meetup', tone: 0, name: 'Leo Park', role: 'Founder, [Startup]', tag: 'Via Founders & Friends', why: 'Leo is a regular at Founders & Friends and is building for two-person teams. He fits the design-partner profile, and Ana can introduce you on Tuesday.', common: ['Small teams', 'Founders & Friends'], bring: ['Your onboarding research', 'A seat at Thursday\'s coffee with Maya'], learn: ['How he onboards customers today', 'Whether he would pilot for free'], questions: Q('How do your first users get set up today?', 'What would a pilot need to prove in 30 days?') },
+{ id: 'nadia', a: 225, via: 'meetup', tone: 2, name: 'Nadia Haddad', role: 'Ops lead, [Company]', tag: 'Via Founders & Friends', why: 'Nadia runs operations for a 12-person team and complained about onboarding tools at the last meetup. She is attending on Tuesday.', common: ['Onboarding', 'Small teams'], bring: ['A demo of your onboarding flow', 'Notes from Priya\'s team'], learn: ['Which tools her team dropped and why', 'Who owns onboarding on her side'], questions: Q('Which onboarding tool did you drop last, and why?', 'Who would need to sign off on a pilot?') },
+{ id: 'tom', a: 340, via: 'ana', tone: 3, name: 'Tom Becker', role: 'Founder, [Company]', tag: 'Ana can introduce', why: 'Tom co-hosts the meetup with Ana and just hired his first customer-success person, which usually means onboarding is on fire.', common: ['Founders & Friends', 'Customer success'], bring: ['An intro to Nadia', 'Your customer-discovery notes'], learn: ['How he measures activation', 'Whether he would be a design partner'], questions: Q('What does a good first week look like for your customers?', 'Where do new users get stuck today?') },
+{ id: 'grace', a: 0, via: 'ana', tone: 1, name: 'Grace Liu', role: 'Product lead, [Company]', tag: 'Ana can introduce', why: 'Grace leads product at a 20-person startup and asked Ana for onboarding recommendations last month.', common: ['Product management', 'Onboarding'], bring: ['A short teardown of their onboarding', 'An intro to Priya'], learn: ['What she has already tried', 'Her timeline for fixing it'], questions: Q('What did you try last quarter, and what stuck?', 'What would make you switch tools?') },
+{ id: 'omar', a: 20, via: 'ana', tone: 0, name: 'Omar Farouk', role: 'Designer, freelance', tag: 'Ana can introduce', why: 'Omar designs onboarding flows for early-stage teams and could send design partners your way.', common: ['Onboarding UX', 'Freelance network'], bring: ['A referral arrangement', 'Your research notes'], learn: ['Which clients need tooling', 'What he charges for onboarding work'], questions: Q('Which of your clients struggles most with onboarding?', 'What do you wish a tool did for you?') },
+{ id: 'elena', a: 160, via: 'marcus', tone: 2, name: 'Elena Rossi', role: 'Founder, [Startup]', tag: 'Marcus can introduce', why: 'Elena is one of the two founders Marcus offered to introduce. Her team is small and selling to other small teams.', common: ['Marcus\'s portfolio', 'B2B for small teams'], bring: ['The intro Marcus promised', 'Your deck'], learn: ['How she runs onboarding with two engineers', 'What she would pay for'], questions: Q('How much of your week goes to onboarding customers by hand?', 'What would you automate first?') },
+{ id: 'jonas', a: 180, via: 'marcus', tone: 3, name: 'Jonas Weber', role: 'CTO, [Startup]', tag: 'Marcus can introduce', why: 'Jonas is the second founder Marcus mentioned. He is technical, so a developer-onboarding conversation lands well.', common: ['Marcus\'s portfolio', 'Developer tools'], bring: ['Your notes on developer onboarding', 'An intro to Daniel'], learn: ['Where their integration setup fails', 'Whether they would pilot'], questions: Q('Where do developers drop off during setup?', 'What would a pilot need to show your team?') }
+];
+// ---------- Data: groups (collapsed) ----------
+const groups = [
+{ id: 'g-climate', a: 40, via: 'demo', name: 'Climate scene', tag: 'Meet at Demo Morning', viaText: 'Reached through Climate Tech Demo Morning and Daniel', why: 'Early climate teams demoing on Saturday. Small teams with first customers, which is the profile that needs onboarding help. Grouped until Saturday, when your companion will promote whoever you meet.', ctaLabel: 'Open Demo Morning', people: [
+{ id: 'ravi', tone: 2, name: 'Ravi Menon', role: 'Founder, [Climate startup]', note: 'Demoing Saturday. Three customers so far.' },
+{ id: 'sara', tone: 0, name: 'Sara Kim', role: 'Cofounder, [Climate startup]', note: 'Asked on the event page about onboarding.' },
+{ id: 'ben', tone: 3, name: 'Ben Adler', role: 'Product, [Climate startup]', note: 'Knows Daniel from a previous job.' } ] },
+{ id: 'g-community', a: 140, via: 'sofia', name: 'Community builders', tag: 'Sofia\'s dinners', viaText: 'Reached through Sofia Lindqvist', why: 'Organizers who attend Sofia\'s monthly dinner. Not design partners themselves, but each one runs a room full of small-team founders.', ctaLabel: 'See Sofia\'s dinner', people: [
+{ id: 'ines', tone: 1, name: 'Ines Costa', role: 'Organizer, [Meetup]', note: 'Runs a product meetup across town.' },
+{ id: 'yuki', tone: 2, name: 'Yuki Tanaka', role: 'Community, [Coworking space]', note: 'Hosts 40 small teams in one building.' },
+{ id: 'paul', tone: 0, name: 'Paul Nguyen', role: 'Organizer, [Newsletter]', note: 'Writes a local founders newsletter.' } ] },
+{ id: 'g-founders', a: 200, via: 'marcus', name: 'Marcus\'s founders', tag: 'Intro on request', viaText: 'Reached through Marcus Webb', why: 'The rest of Marcus\'s local portfolio. He offered two intros; these four are the ones your companion would ask for next, ranked by team size and onboarding pain.', ctaLabel: 'Ask Marcus', people: [
+{ id: 'hannah', tone: 3, name: 'Hannah Berg', role: 'Founder, [Startup]', note: 'Sells to accountants. Manual onboarding.' },
+{ id: 'diego', tone: 0, name: 'Diego Alvarez', role: 'Founder, [Startup]', note: 'Hiring a customer-success lead.' },
+{ id: 'mei', tone: 2, name: 'Mei Wong', role: 'CEO, [Startup]', note: 'Posted about churn in week one.' },
+{ id: 'chris', tone: 1, name: 'Chris Olsen', role: 'Founder, [Startup]', note: 'Met Marcus at the same coffee spot.' } ] }
+];
+const events = [
+{ id: 'meetup', a: 270, title: 'Founders & Friends Meetup', meta: 'Tue, Sep 22 · 6:30 pm · [Venue]', metaLong: 'Tue, Sep 22 · 6:30 to 9:00 pm · [Venue], [Neighborhood]', tag: '5 people you know', who: ['priya', 'ana', 'maya', 'leo', 'nadia'], whoNotes: { priya: 'Owes her the article. Pick the thread back up.', ana: 'Runs the room. Ask for three introductions.', maya: 'Say hello, so Thursday\'s coffee is warm.', leo: 'Ask Ana to introduce you.', nadia: 'She complained about onboarding tools last time.' }, why: 'Five people on this map will be in one room, and Ana can introduce you to the rest. This is the densest hour of your week for design-partner conversations.', steps: ['Arrive early and find Ana. Ask who she would introduce you to.', 'Find Priya and hand her the article in person.', 'Say hello to Maya, then leave her a reason to continue on Thursday.'] },
+{ id: 'demo', a: 90, title: 'Climate Tech Demo Morning', meta: 'Sat, Sep 26 · 10:00 am · [Community hall]', metaLong: 'Sat, Sep 26 · 10:00 am to 12:30 pm · [Community hall]', tag: 'Daniel is speaking', who: ['daniel'], whoNotes: { daniel: 'Speaking. Ask one question after his talk.' }, why: 'Three demoing teams match interests you saved last month, and Daniel is speaking. Early climate teams are exactly the kind of small team that needs onboarding help.', steps: ['Sit near the front for Daniel\'s talk and note one specific question.', 'Visit the three demo tables your companion flagged.', 'Mention Marcus when you introduce yourself to Daniel.'] }
+];
+
+// ---------- Positions ----------
+const pos = { me: { x: CX, y: CY } };
+inner.forEach((p) => { pos[p.id] = pol(p.a, R1); });
+warm.forEach((p) => { pos[p.id] = pol(p.a, R2); });
+groups.forEach((g) => { const isOpen = st.open === g.id; pos[g.id] = pol(g.a, isOpen ? R2 - 80 : R2); g.people.forEach((m, i) => { const off = (i - (g.people.length - 1) / 2) * 18; pos[m.id] = pol(g.a + off, R2); }); });
+const openG = st.open ? groups.filter((g) => g.id === st.open)[0] : null;
+const angDist = (a, b) => { const d = Math.abs(((a - b) % 360 + 360) % 360); return Math.min(d, 360 - d); };
+const hiddenByFan = (a) => !!openG && angDist(a, openG.a) < 45;
+events.forEach((e) => { pos[e.id] = pol(e.a, R2); });
+const byId = {};
+inner.forEach((p) => { byId[p.id] = { ...p, tier: 'inner' }; });
+warm.forEach((p) => { byId[p.id] = { ...p, tier: 'warm', status: 'Warm', calLabel: 'Schedule', whyTitle: 'Why ' + p.name.split(' ')[0] + ' is on your map', pill: p.tag, pillKind: 'cool' }; });
+groups.forEach((g) => { g.people.forEach((m) => { byId[m.id] = { ...m, tier: 'member', group: g.id, tag: g.tag, status: 'Not yet met', calLabel: 'Add to prep', whyTitle: 'Why ' + m.name.split(' ')[0] + ' is in ' + g.name, why: m.note + ' ' + g.why, common: [g.name, 'Small teams'], bring: ['An intro through ' + g.viaText.replace('Reached through ', ''), 'Your onboarding research'], learn: ['How they onboard customers today', 'Whether they would pilot'], questions: Q('How do your first users get set up today?', 'What would a pilot need to prove?'), pill: g.tag, pillKind: 'cool' }; }); });
+const groupById = {}; groups.forEach((g) => { groupById[g.id] = g; });
+const eventById = {}; events.forEach((e) => { eventById[e.id] = e; });
+
+// ---------- Lenses ----------
+const anchorEdges = warm.map((p) => ({ a: p.via, b: p.id, kind: 'anchor' })).concat(groups.map((g) => ({ a: g.via, b: g.id, kind: 'anchor' })));
+const lensDefs = {
+goal: { label: 'Paths to your goal', hint: 'Say hello to Maya on Tuesday, so Thursday\'s coffee is already a design-partner conversation. Ask Ana for Leo and Nadia while you are there.', edges: [
+{ a: 'me', b: 'maya', label: 'Design partner', t: 0.36 }, { a: 'me', b: 'priya', label: 'Warmest lead', t: 0.46 },
+{ a: 'me', b: 'marcus', label: 'Route to 6 founders', t: 0.5 }, { a: 'me', b: 'ana', label: 'Knows the whole room', t: 0.5 },
+{ a: 'me', b: 'sofia', label: 'Intro promised', t: 0.74 }, { a: 'me', b: 'daniel', label: 'Ask after his talk', t: 0.74 },
+{ a: 'me', b: 'meetup', label: '5 people you know', t: 0.6 }, { a: 'me', b: 'demo', label: 'Daniel is speaking', t: 0.7 } ].concat(anchorEdges) },
+who: { label: 'Who knows whom', hint: 'Ana reaches five people here in one evening. Marcus reaches six more. Ask them first.', edges: [
+{ a: 'ana', b: 'priya', label: 'Both at Founders & Friends', t: 0.5 }, { a: 'ana', b: 'sofia', label: 'Organizer circle', t: 0.4 },
+{ a: 'marcus', b: 'sofia', label: 'Marcus can introduce', t: 0.5 }, { a: 'marcus', b: 'daniel', label: 'Marcus knows him', t: 0.28 },
+{ a: 'priya', b: 'maya', label: 'Met once', t: 0.5 }, { a: 'me', b: 'marcus', label: 'Coffee, Sep 8', t: 0.5 }, { a: 'me', b: 'ana', label: 'Met Aug 27', t: 0.5 } ].concat(anchorEdges.map((e) => ({ ...e, kind: 'who' }))) },
+where: { label: 'Where you\'ll meet them', hint: 'Tuesday covers seven people. Saturday covers Daniel and the climate group. Sofia still needs an intro from Marcus.', edges: [
+{ a: 'meetup', b: 'priya', label: '', t: 0.5 }, { a: 'meetup', b: 'ana', label: '', t: 0.5 }, { a: 'meetup', b: 'maya', label: '', t: 0.5 },
+{ a: 'meetup', b: 'leo', label: '', t: 0.5 }, { a: 'meetup', b: 'nadia', label: '', t: 0.5 }, { a: 'demo', b: 'daniel', label: '', t: 0.5 }, { a: 'demo', b: 'g-climate', label: '', t: 0.5 },
+{ a: 'me', b: 'maya', label: 'Coffee, Thu 3:30 pm', t: 0.4 }, { a: 'me', b: 'meetup', label: 'You are going', t: 0.6 }, { a: 'me', b: 'demo', label: 'On your plan', t: 0.7 } ] }
+};
+const lens = lensDefs[st.lens];
+const sel = st.sel, open = st.open, intro = st.intro, drawing = intro || st.relens;
+const draw = st.gen % 2 === 0 ? 'nm-draw-a' : 'nm-draw-b';
+let edgeList = lens.edges.slice();
+if (open && groupById[open]) edgeList = edgeList.concat(groupById[open].people.map((m) => ({ a: open, b: m.id, kind: 'fan' })));
+const linkedTo = (id) => edgeList.some((e) => (e.a === sel && e.b === id) || (e.b === sel && e.a === id));
+const isDim = (id) => sel && sel !== id && !linkedTo(id);
+
+const lenses = ['goal', 'who', 'where'].map((id) => ({ label: lensDefs[id].label, active: st.lens === id,
+style: 'height:42px;padding:0 20px;border:0;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;' + (st.lens === id ? 'background:#5b3df5;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
+pick: () => go({ lens: id, sel: null, open: null, gen: st.gen + 1, relens: true }) }));
+const views = [{ id: 'map', label: 'Map' }, { id: 'list', label: 'List' }].map((v) => ({ label: v.label, active: st.view === v.id,
+style: 'height:42px;padding:0 18px;border:0;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (st.view === v.id ? 'background:#2e2470;color:#ffffff;' : 'background:transparent;color:#b7a7ff;'),
+pick: () => go({ view: v.id, sel: null, open: null, relens: false }) }));
+
+// ---------- Orbits ----------
 const glowStyle = 'position:absolute;' + box(CX - 300, CY - 300, 600, 600) + 'border-radius:999px;background:radial-gradient(circle, rgba(255,201,60,0.14) 0%, rgba(255,201,60,0) 62%);pointer-events:none;';
 const sweepStyle = 'position:absolute;' + box(CX - R2, CY - R2, R2 * 2, R2 * 2) + 'border-radius:999px;background:conic-gradient(from 0deg, rgba(183,167,255,0) 0deg, rgba(183,167,255,0.16) 48deg, rgba(183,167,255,0) 70deg);animation:nm-orbit 16s linear infinite;pointer-events:none;';
 const ring = (r, extra) => 'position:absolute;' + box(CX - r, CY - r, r * 2, r * 2) + 'border-radius:999px;pointer-events:none;' + extra;
-const ringOuter = ring(R2, 'border:1px solid rgba(183,167,255,0.18);' + (intro ? 'animation:nm-ring .9s cubic-bezier(.2,.8,.2,1) .1s both;' : ''));
-const ringInner = ring(R1, 'border:1px dashed rgba(183,167,255,0.22);animation:nm-orbit 90s linear infinite' + (intro ? ',nm-ring .8s cubic-bezier(.2,.8,.2,1) both' : '') + ';');
+const ringOuter = ring(R2, 'border:1px solid rgba(183,167,255,0.16);' + (intro ? 'animation:nm-ring .9s cubic-bezier(.2,.8,.2,1) .1s both;' : ''));
+const ringInner = ring(R1, 'border:1px dashed rgba(183,167,255,0.26);animation:nm-orbit 90s linear infinite' + (intro ? ',nm-ring .8s cubic-bezier(.2,.8,.2,1) both' : '') + ';');
 
 // ---------- Edges ----------
-const linkedTo = (id) => lens.edges.some((e) => (e.a === sel && e.b === id) || (e.b === sel && e.a === id));
-const edges = lens.edges.map((e, i) => {
-const A = byId[e.a], B = byId[e.b];
-const dx = B.x - A.x, dy = B.y - A.y;
-const len = Math.sqrt(dx * dx + dy * dy);
-const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+const edges = edgeList.map((e, i) => {
+const A = pos[e.a], B = pos[e.b];
+if (!A || !B) return null;
+const dx = B.x - A.x, dy = B.y - A.y, len = Math.sqrt(dx * dx + dy * dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
 const hot = sel && (e.a === sel || e.b === sel);
 const dim = sel && !hot;
+const thin = e.kind === 'anchor' || e.kind === 'fan';
 const color = hot ? '#ffc93c' : (st.lens === 'where' ? '#4be3c6' : '#b7a7ff');
-const t = e.t || 0.5;
-const mx = A.x + dx * t, my = A.y + dy * t;
-const delay = (intro ? 500 : 60) + i * 90;
+const t = e.t || 0.5, mx = A.x + dx * t, my = A.y + dy * t;
+const delay = (intro ? 500 : 60) + i * 60;
 const travel = (2.6 + (len / 400) * 1.6).toFixed(2);
 return {
-label: e.label,
-wrapStyle: 'position:absolute;left:' + U(A.x) + ';top:' + U(A.y) + ';width:' + U(len) + ';height:2px;transform-origin:0 50%;transform:rotate(' + ang.toFixed(2) + 'deg);opacity:' + (dim ? 0.15 : 1) + ';pointer-events:none;',
-lineStyle: 'width:100%;height:100%;transform-origin:0 50%;background-image:repeating-linear-gradient(90deg,' + color + ' 0 ' + U(7) + ',transparent ' + U(7) + ' ' + U(18) + '),linear-gradient(90deg,' + color + ',' + color + ');background-size:' + U(18) + ' 2px,100% 2px;background-repeat:repeat-x,no-repeat;opacity:' + (hot ? 1 : 0.5) + ';animation:' + (drawing ? draw + ' .8s cubic-bezier(.2,.7,.2,1) ' + delay + 'ms both,' : '') + 'nm-flow 1.1s linear infinite;' + (hot ? 'box-shadow:0 0 12px rgba(255,201,60,.6);' : ''),
-dotStyle: 'position:absolute;top:50%;left:0;width:' + U(7) + ';height:' + U(7) + ';margin:' + U(-3.5) + ' 0 0 ' + U(-3.5) + ';border-radius:999px;background:' + (hot ? '#ffd86b' : '#ffffff') + ';box-shadow:0 0 ' + U(10) + ' ' + color + ',0 0 ' + U(3) + ' #ffffff;animation:nm-travel ' + travel + 's cubic-bezier(.45,0,.55,1) ' + ((drawing ? delay + 700 : 0) + i * 430) + 'ms infinite;opacity:0;',
-labelStyle: 'position:absolute;left:' + U(mx) + ';top:' + U(my) + ';transform:translate(-50%,-50%);box-sizing:border-box;height:' + U(28) + ';display:flex;align-items:center;padding:0 ' + U(12) + ';border-radius:999px;font-size:' + U(12) + ';font-weight:600;white-space:nowrap;pointer-events:none;opacity:' + (dim ? 0.12 : 1) + ';' + (drawing ? 'animation:nm-fade .5s ease ' + (delay + 450) + 'ms both;' : '') + (hot ? 'background:#3d3210;border:1px solid #ffc93c;color:#ffd86b;' : 'background:#100c30;border:1px solid #2c2360;color:#cdc6ee;') + (e.label ? '' : 'display:none;')
+label: e.label || '',
+wrapStyle: 'position:absolute;left:' + U(A.x) + ';top:' + U(A.y) + ';width:' + U(len) + ';height:2px;transform-origin:0 50%;transform:rotate(' + ang.toFixed(2) + 'deg);opacity:' + (dim ? 0.12 : 1) + ';pointer-events:none;',
+lineStyle: 'width:100%;height:100%;transform-origin:0 50%;background-image:repeating-linear-gradient(90deg,' + color + ' 0 ' + U(7) + ',transparent ' + U(7) + ' ' + U(18) + '),linear-gradient(90deg,' + color + ',' + color + ');background-size:' + U(18) + ' 2px,100% 2px;background-repeat:repeat-x,no-repeat;opacity:' + (hot ? 1 : (thin ? 0.28 : 0.5)) + ';animation:' + (drawing ? draw + ' .8s cubic-bezier(.2,.7,.2,1) ' + delay + 'ms both,' : '') + 'nm-flow 1.1s linear infinite;' + (hot ? 'box-shadow:0 0 12px rgba(255,201,60,.6);' : ''),
+dotStyle: 'position:absolute;top:50%;left:0;width:' + U(6) + ';height:' + U(6) + ';margin:' + U(-3) + ' 0 0 ' + U(-3) + ';border-radius:999px;background:' + (hot ? '#ffd86b' : '#ffffff') + ';box-shadow:0 0 ' + U(10) + ' ' + color + ';animation:nm-travel ' + travel + 's cubic-bezier(.45,0,.55,1) ' + ((drawing ? delay + 700 : 0) + i * 370) + 'ms infinite;opacity:0;' + (thin && !hot ? 'display:none;' : ''),
+labelStyle: 'position:absolute;left:' + U(mx) + ';top:' + U(my) + ';transform:translate(-50%,-50%);box-sizing:border-box;height:' + U(26) + ';display:flex;align-items:center;padding:0 ' + U(11) + ';border-radius:999px;font-size:' + U(12) + ';font-weight:600;white-space:nowrap;pointer-events:none;opacity:' + (dim ? 0.1 : 1) + ';' + (drawing ? 'animation:nm-fade .5s ease ' + (delay + 450) + 'ms both;' : '') + (hot ? 'background:#3d3210;border:1px solid #ffc93c;color:#ffd86b;' : 'background:#100c30;border:1px solid #2c2360;color:#cdc6ee;') + (e.label ? '' : 'display:none;')
 };
-});
+}).filter(Boolean);
 
 // ---------- Nodes ----------
-const pillTones = {
-hot: 'background:#4a1d1f;color:#ff8d84;',
-warm: 'background:#3d3210;color:#ffd86b;',
-cool: 'background:#0d3d3a;color:#4be3c6;'
-};
-const people = peopleData.map((p, i) => {
-const tone = tones[p.tone];
-const selected = sel === p.id;
-const dim = sel && !selected && !linkedTo(p.id);
-return {
-name: p.name, role: p.role, pill: p.pill,
-initials: initials(p.name),
-selected: selected,
-style: 'position:absolute;left:' + U(p.x - 100) + ';top:' + U(p.y - 42) + ';width:' + U(200) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(4) + ';padding:0;border:0;background:transparent;color:#f3f0ff;cursor:pointer;text-align:center;opacity:' + (dim ? 0.28 : 1) + ';' + (intro ? 'animation:nm-pop .6s cubic-bezier(.2,.8,.2,1) ' + (300 + i * 80) + 'ms both;' : ''),
-avStyle: 'display:flex;align-items:center;justify-content:center;width:' + U(84) + ';height:' + U(84) + ';margin-bottom:' + U(8) + ';border-radius:999px;font-size:' + U(26) + ';font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';' + (selected ? 'transform:scale(1.1);animation:nm-selpulse 1.6s ease-out infinite;' : 'box-shadow:0 0 0 4px #100c30,0 0 0 6px ' + tone.bg + '66,0 18px 40px -16px rgba(0,0,0,.8);'),
-pillStyle: 'display:flex;align-items:center;height:' + U(26) + ';margin-top:' + U(4) + ';padding:0 ' + U(12) + ';border-radius:999px;font-size:' + U(12) + ';font-weight:700;' + pillTones[p.pillKind],
-pick: () => go({ sel: selected ? null : p.id, relens: false })
-};
+const pillTones = { hot: 'background:#4a1d1f;color:#ff8d84;', warm: 'background:#3d3210;color:#ffd86b;', cool: 'background:#0d3d3a;color:#4be3c6;' };
+const people = inner.map((p, i) => {
+const tone = tones[p.tone], P = pos[p.id], selected = sel === p.id;
+return { name: p.name, role: p.role, pill: p.pill, initials: initials(p.name), selected: selected,
+style: 'position:absolute;left:' + U(P.x - 95) + ';top:' + U(P.y - 40) + ';width:' + U(190) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(3) + ';padding:0;border:0;background:transparent;color:#f3f0ff;cursor:pointer;text-align:center;opacity:' + (isDim(p.id) ? 0.28 : 1) + ';' + (intro ? 'animation:nm-pop .6s cubic-bezier(.2,.8,.2,1) ' + (300 + i * 80) + 'ms both;' : ''),
+avStyle: 'display:flex;align-items:center;justify-content:center;width:' + U(80) + ';height:' + U(80) + ';margin-bottom:' + U(6) + ';border-radius:999px;font-size:' + U(25) + ';font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';' + (selected ? 'transform:scale(1.1);animation:nm-selpulse 1.6s ease-out infinite;' : 'box-shadow:0 0 0 4px #100c30,0 0 0 6px ' + tone.bg + '66,0 18px 40px -16px rgba(0,0,0,.8);'),
+pillStyle: 'display:flex;align-items:center;height:' + U(24) + ';margin-top:' + U(3) + ';padding:0 ' + U(11) + ';border-radius:999px;font-size:' + U(11.5) + ';font-weight:700;' + pillTones[p.pillKind],
+pick: () => go({ sel: selected ? null : p.id, open: null, relens: false }) };
 });
-const events = eventData.map((e, i) => {
-const selected = sel === e.id;
-const dim = sel && !selected && !linkedTo(e.id);
-return {
-title: e.title, meta: e.meta, tag: e.tag,
-selected: selected,
-style: 'position:absolute;left:' + U(e.x - 150) + ';top:' + U(e.y - 46) + ';width:' + U(300) + ';box-sizing:border-box;display:flex;flex-direction:column;gap:' + U(5) + ';padding:' + U(14) + ' ' + U(16) + ';border-radius:' + U(20) + ';background:#161141;border:1px solid ' + (selected ? '#ffc93c' : '#2c2360') + ';color:#f3f0ff;cursor:pointer;opacity:' + (dim ? 0.28 : 1) + ';box-shadow:' + (selected ? '0 0 0 4px rgba(255,201,60,.3),0 24px 48px -16px rgba(255,201,60,.4)' : '0 24px 48px -20px rgba(0,0,0,.8)') + ';' + (intro ? 'animation:nm-pop .6s cubic-bezier(.2,.8,.2,1) ' + (800 + i * 120) + 'ms both;' : ''),
-pick: () => go({ sel: selected ? null : e.id, relens: false })
+const miniNode = (p, i, extra) => {
+const tone = tones[p.tone], P = pos[p.id], selected = sel === p.id;
+return { name: p.name, tag: p.tag || '', initials: initials(p.name), selected: selected,
+style: 'position:absolute;left:' + U(P.x - 60) + ';top:' + U(P.y - 24) + ';width:' + U(120) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(3) + ';padding:0;border:0;background:transparent;color:#f3f0ff;cursor:pointer;text-align:center;opacity:' + (isDim(p.id) ? 0.25 : 1) + ';' + extra,
+avStyle: 'display:flex;align-items:center;justify-content:center;width:' + U(48) + ';height:' + U(48) + ';margin-bottom:' + U(3) + ';border-radius:999px;font-size:' + U(15) + ';font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';' + (selected ? 'transform:scale(1.15);animation:nm-selpulse 1.6s ease-out infinite;' : 'box-shadow:0 0 0 3px #100c30,0 0 0 4px ' + tone.bg + '66;'),
+tagStyle: 'font-size:' + U(10.5) + ';font-weight:600;color:#a9a3cf;line-height:1.2;',
+pick: () => go({ sel: selected ? null : p.id, open: p.group || null, relens: false }) };
 };
+const minis = warm.map((p, i) => miniNode(p, i, (hiddenByFan(p.a) ? 'display:none;' : '') + (intro ? 'animation:nm-pop .5s cubic-bezier(.2,.8,.2,1) ' + (900 + i * 60) + 'ms both;' : '')));
+const groupsOut = groups.map((g, i) => {
+const P = pos[g.id], selected = sel === g.id, isOpen = open === g.id;
+return { name: g.name, tag: g.tag, count: '+' + g.people.length, selected: selected,
+style: 'position:absolute;left:' + U(P.x - 60) + ';top:' + U(P.y - 28) + ';width:' + U(120) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(3) + ';padding:0;border:0;background:transparent;color:#f3f0ff;cursor:pointer;text-align:center;opacity:' + (sel && !selected && !isOpen && !linkedTo(g.id) ? 0.25 : 1) + ';' + (!isOpen && hiddenByFan(g.a) ? 'display:none;' : '') + (intro ? 'animation:nm-pop .5s cubic-bezier(.2,.8,.2,1) ' + (1100 + i * 80) + 'ms both;' : ''),
+avStyle: 'display:flex;flex-direction:column;align-items:center;justify-content:center;width:' + U(56) + ';height:' + U(56) + ';margin-bottom:' + U(3) + ';border-radius:999px;background:#1a1350;color:#d3c9ff;border:1.5px dashed ' + (selected || isOpen ? '#ffc93c' : '#b7a7ff') + ';' + (selected ? 'animation:nm-selpulse 1.6s ease-out infinite;' : ''),
+tagStyle: 'font-size:' + U(10.5) + ';font-weight:600;color:#a9a3cf;line-height:1.2;',
+pick: () => go({ sel: isOpen && selected ? null : g.id, open: isOpen && selected ? null : g.id, relens: false }) };
 });
-const chips = chipData.map((c, i) => {
-const dim = sel && sel !== c.who;
-const pos = c.side === 'l' ? 'right:' + U(W - 190) + ';' : 'left:' + U(872) + ';';
-const bob = 'nm-bob ' + (3.6 + (i % 4) * 0.5).toFixed(1) + 's ease-in-out ' + (-(i * 0.7)).toFixed(1) + 's infinite alternate';
-return {
-text: c.text,
-style: 'position:absolute;' + pos + 'top:' + U(c.y) + ';display:flex;align-items:center;height:' + U(32) + ';padding:0 ' + U(14) + ';border-radius:999px;background:#2e2470;border:1px solid #3a3080;color:#d3c9ff;font-size:' + U(13) + ';font-weight:600;white-space:nowrap;opacity:' + (dim ? 0.18 : 1) + ';animation:' + (intro ? 'nm-rise .5s ease ' + (1000 + i * 45) + 'ms both,' : '') + bob + ';'
-};
+const members = open && groupById[open] ? groupById[open].people.map((m, i) => {
+const G = pos[open], P = pos[m.id];
+return miniNode({ ...m, tag: '' }, i, '--fx:' + U(G.x - P.x) + ';--fy:' + U(G.y - P.y) + ';animation:nm-fan .5s cubic-bezier(.2,.8,.2,1) ' + (i * 70) + 'ms both;');
+}) : [];
+const eventsOut = events.map((e, i) => {
+const P = pos[e.id], selected = sel === e.id;
+return { title: e.title, meta: e.meta, tag: e.tag, selected: selected,
+style: 'position:absolute;left:' + U(P.x - 140) + ';top:' + U(P.y - 40) + ';width:' + U(280) + ';box-sizing:border-box;display:flex;flex-direction:column;gap:' + U(3) + ';padding:' + U(11) + ' ' + U(14) + ';border-radius:' + U(18) + ';background:#161141;border:1px solid ' + (selected ? '#ffc93c' : '#2c2360') + ';color:#f3f0ff;cursor:pointer;opacity:' + (isDim(e.id) ? 0.28 : 1) + ';box-shadow:' + (selected ? '0 0 0 4px rgba(255,201,60,.3)' : '0 24px 48px -20px rgba(0,0,0,.8)') + ';' + (intro ? 'animation:nm-pop .6s cubic-bezier(.2,.8,.2,1) ' + (800 + i * 120) + 'ms both;' : ''),
+pick: () => go({ sel: selected ? null : e.id, open: null, relens: false }) };
 });
 
 // ---------- Camera ----------
 let worldStyle = 'position:absolute;inset:0;transform-origin:0 0;--tx:0px;--ty:0px;--s:1;transform:translate(0px,0px) scale(1);';
-if (sel) {
-const s = 0.86;
-const P = byId[sel];
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const tx = clamp(290 - s * P.x, 562 - W * s, 0);
-const ty = clamp((H / 2) - s * P.y, 0, H - H * s);
+if (sel && pos[sel]) {
+const s = 0.86, P = pos[sel], clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const tx = clamp(290 - s * P.x, 562 - W * s, 0), ty = clamp((H / 2) - s * P.y, 0, H - H * s);
 worldStyle = 'position:absolute;inset:0;transform-origin:0 0;--tx:' + U(tx) + ';--ty:' + U(ty) + ';--s:' + s + ';transform:translate(' + U(tx) + ',' + U(ty) + ') scale(' + s + ');animation:nm-zoom .7s cubic-bezier(.2,.8,.2,1) both;';
 }
-const meDim = sel && !linkedTo('me');
-const meStyle = 'position:absolute;left:' + U(CX - 160) + ';top:' + U(CY - 58) + ';width:' + U(320) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(4) + ';text-align:center;pointer-events:none;opacity:' + (meDim ? 0.35 : 1) + ';' + (intro ? 'animation:nm-pop .7s cubic-bezier(.2,.8,.2,1) both;' : '');
+const meStyle = 'position:absolute;left:' + U(CX - 160) + ';top:' + U(CY - 58) + ';width:' + U(320) + ';display:flex;flex-direction:column;align-items:center;gap:' + U(4) + ';text-align:center;pointer-events:none;opacity:' + (sel && !linkedTo('me') ? 0.35 : 1) + ';' + (intro ? 'animation:nm-pop .7s cubic-bezier(.2,.8,.2,1) both;' : '');
 const goalStyle = 'display:' + (st.lens === 'goal' ? 'flex' : 'none') + ';flex-direction:column;align-items:center;gap:' + U(8) + ';margin-top:' + U(10) + ';';
 const veilStyle = 'position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(13,10,36,0) 40%,rgba(13,10,36,.55) 100%);transition:opacity .5s ease;opacity:' + (sel ? 1 : 0) + ';';
+const showList = st.view === 'list';
+const sceneStyle = showList ? 'display:none;' : '';
+const legendStyle = 'position:absolute;right:20px;top:18px;z-index:5;display:' + (showList ? 'none' : 'flex') + ';align-items:center;gap:16px;height:34px;padding:0 16px;background:rgba(13,10,36,0.8);border:1px solid #2c2360;border-radius:999px;font-size:13px;font-weight:600;color:#cdc6ee;white-space:nowrap;';
+const total = inner.length + warm.length + groups.reduce((n, g) => n + g.people.length, 0);
+const countLine = total + ' people · ' + inner.length + ' to act on this week';
+
+// ---------- List view ----------
+const first = (t) => { const f = t.split('. ')[0]; return f.endsWith('.') ? f : f + '.'; };
+const rowOf = (p, line) => {
+const tone = tones[p.tone], selected = sel === p.id;
+return { name: p.name, role: p.role, line: line, pill: p.pill || p.tag || '', initials: initials(p.name), selected: selected,
+style: 'display:flex;align-items:flex-start;gap:14px;width:100%;box-sizing:border-box;padding:14px 16px;border:1px solid ' + (selected ? '#ffc93c' : '#2c2360') + ';border-radius:16px;background:#161141;color:#f3f0ff;text-align:left;cursor:pointer;',
+avStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;border-radius:999px;font-size:15px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
+pillStyle: 'display:flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:11px;font-weight:700;' + pillTones[p.pillKind || 'cool'],
+pick: () => go({ sel: p.id, open: p.group || null, relens: false }) };
+};
+const listSections = [
+{ title: 'Act on this week', sub: inner.length + ' people on the inner ring', rows: inner.map((p) => rowOf(p, first(p.why))) },
+{ title: 'Warm', sub: warm.length + ' people, each one introduction away', rows: warm.map((p) => rowOf(byId[p.id], first(p.why))) }
+].concat(groups.map((g) => ({ title: g.name, sub: g.people.length + ' people · ' + g.viaText.toLowerCase(), rows: g.people.map((m) => rowOf(byId[m.id], m.note)) })));
 
 // ---------- Panels ----------
-const selPerson = peopleData.filter((p) => p.id === sel)[0];
-const selEvent = eventData.filter((e) => e.id === sel)[0];
+const selPerson = sel && byId[sel] ? byId[sel] : null;
+const selEvent = sel && eventById[sel] ? eventById[sel] : null;
+const selGroup = sel && groupById[sel] ? groupById[sel] : null;
 const shapePerson = (p) => {
-const tone = tones[p.tone];
-const done = !!st.done[p.id];
-const statusTone = p.status === 'Suggested' ? 'background:#0d3d3a;color:#4be3c6;' : 'background:#173d2a;color:#5fe3a0;';
-return {
-name: p.name, role: p.role, status: p.status, calLabel: p.calLabel, whyTitle: p.whyTitle, why: p.why,
-initials: initials(p.name),
+const tone = tones[p.tone], done = !!st.done[p.id];
+const statusTone = p.status === 'In your network' || p.status === 'Coffee on Thursday' ? 'background:#173d2a;color:#5fe3a0;' : 'background:#0d3d3a;color:#4be3c6;';
+return { name: p.name, role: p.role, status: p.status, calLabel: p.calLabel, whyTitle: p.whyTitle, why: p.why, initials: initials(p.name),
 bigAvStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:76px;height:76px;border-radius:999px;font-size:26px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
 statusStyle: 'display:flex;align-items:center;flex-shrink:0;height:30px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;' + statusTone,
-common: p.common.map((t) => ({ text: t })),
-bring: p.bring.map((t) => ({ text: t })),
-learn: p.learn.map((t) => ({ text: t })),
+common: p.common.map((t) => ({ text: t })), bring: p.bring.map((t) => ({ text: t })), learn: p.learn.map((t) => ({ text: t })),
 questions: p.questions.map((t, i) => ({ n: String(i + 1), text: t })),
-done: done,
-doneLabel: done ? 'Completed' : 'Mark as completed',
+done: done, doneLabel: done ? 'Completed' : 'Mark as completed',
 doneStyle: 'height:50px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (done ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#f3f0ff;color:#1a1440;border:2px solid #f3f0ff;'),
-toggleDone: () => go({ done: { ...st.done, [p.id]: !done } })
-};
+toggleDone: () => go({ done: { ...st.done, [p.id]: !done } }) };
 };
 const shapeEvent = (e) => {
 const added = !!st.added[e.id];
-return {
-title: e.title, tag: e.tag, metaLong: e.metaLong, why: e.why,
-who: e.who.map((id) => {
-const q = peopleData.filter((p) => p.id === id)[0];
-const tone = tones[q.tone];
-return {
-name: q.name, note: e.whoNotes[id], initials: initials(q.name),
-avStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;border-radius:999px;font-size:14px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';',
-pick: () => go({ sel: id, relens: false })
-};
-}),
+return { title: e.title, tag: e.tag, metaLong: e.metaLong, why: e.why,
+who: e.who.map((id) => { const q = byId[id], tone = tones[q.tone]; return { name: q.name, note: e.whoNotes[id], initials: initials(q.name), avStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;border-radius:999px;font-size:14px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';', pick: () => go({ sel: id, open: null, relens: false }) }; }),
 steps: e.steps.map((t, i) => ({ n: String(i + 1), text: t })),
-added: added,
-addLabel: added ? 'On your plan' : 'Add to plan',
+added: added, addLabel: added ? 'On your plan' : 'Add to plan',
 addStyle: 'height:50px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (added ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#f3f0ff;color:#1a1440;border:2px solid #f3f0ff;'),
-toggleAdd: () => go({ added: { ...st.added, [e.id]: !added } })
+toggleAdd: () => go({ added: { ...st.added, [e.id]: !added } }) };
 };
+const shapeGroup = (g) => {
+const promoted = !!st.promoted[g.id];
+return { name: g.name, count: String(g.people.length), via: g.viaText, why: g.why, ctaLabel: g.ctaLabel,
+people: g.people.map((m) => { const tone = tones[m.tone]; return { name: m.name, note: m.role + ' · ' + m.note, initials: initials(m.name), avStyle: 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;border-radius:999px;font-size:14px;font-weight:700;background:' + tone.bg + ';color:' + tone.fg + ';', pick: () => go({ sel: m.id, open: g.id, relens: false }) }; }),
+promoted: promoted, promoteLabel: promoted ? 'Watching this group' : 'Watch this group',
+promoteStyle: 'height:50px;border-radius:999px;font-size:15px;font-weight:700;cursor:pointer;' + (promoted ? 'background:#14c8a8;color:#1a1440;border:2px solid #14c8a8;' : 'background:#f3f0ff;color:#1a1440;border:2px solid #f3f0ff;'),
+togglePromote: () => go({ promoted: { ...st.promoted, [g.id]: !promoted } }) };
 };
 
-return {
-hint: lens.hint,
-lenses: lenses,
-glowStyle: glowStyle,
-sweepStyle: sweepStyle,
-ringOuter: ringOuter,
-ringInner: ringInner,
-edges: edges,
-chips: chips,
-events: events,
-people: people,
-meStyle: meStyle,
-goalStyle: goalStyle,
-worldStyle: worldStyle,
-veilStyle: veilStyle,
-showPerson: !!selPerson,
-showEvent: !!selEvent,
-p: shapePerson(selPerson || peopleData[0]),
-ev: shapeEvent(selEvent || eventData[0]),
-back: () => go({ sel: null, relens: false })
-};
+return { hint: lens.hint, lenses: lenses, views: views, countLine: countLine, legendStyle: legendStyle, sceneStyle: sceneStyle, showList: showList, listSections: listSections,
+glowStyle: glowStyle, sweepStyle: sweepStyle, ringOuter: ringOuter, ringInner: ringInner,
+edges: edges, people: people, minis: minis, groups: groupsOut, members: members, events: eventsOut,
+meStyle: meStyle, goalStyle: goalStyle, worldStyle: worldStyle, veilStyle: veilStyle,
+showPerson: !!selPerson, showEvent: !!selEvent, showGroup: !!selGroup,
+p: shapePerson(selPerson || inner[0]), ev: shapeEvent(selEvent || events[0]), g: shapeGroup(selGroup || groups[0]),
+back: () => go({ sel: null, open: null, relens: false }) };
 }
 }
 </script>
