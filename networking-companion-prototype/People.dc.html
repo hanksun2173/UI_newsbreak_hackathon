@@ -29,7 +29,8 @@
           button {
             font-family: inherit;
           }
-          /* Map system. The scene is designed at 1062x940 and every scene length is expressed in --u (1px at design size),so it scales to whatever height the stage gets. Two orbits around you: edge labels on the inner orbit (r=198),people and events on the outer orbit (r=396). Edges are rotated 2px divs with a signal dot travelling along them. */.nm-stage {
+          /* Map system. The scene is designed at 1062x940 and every scene length is expressed in --u (1px at design size), so it scales to whatever height the stage gets. Two orbits around you: edge labels on the inner orbit (r=198), people and events on the outer orbit (r=396). Edges are rotated 2px divs with a signal dot travelling along them. */
+          .nm-stage {
             container-type: size;
           }
           .nm-scene {
@@ -47,127 +48,161 @@
             overflow: visible;
             pointer-events: none;
           }
-          from {
-            stroke-dashoffset: 1;
+          @keyframes nm-draw2 {
+            from {
+              stroke-dashoffset: 1;
+            }
+            to {
+              stroke-dashoffset: 0;
+            }
           }
-          to {
-            stroke-dashoffset: 0;
+          @keyframes nm-flow2 {
+            from {
+              stroke-dashoffset: 0;
+            }
+            to {
+              stroke-dashoffset: -0.06;
+            }
           }
-          from {
-            stroke-dashoffset: 0;
+          @keyframes nm-pop {
+            from {
+              opacity: 0;
+              transform: scale(.55);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
           }
-          to {
-            stroke-dashoffset: -0.06;
+          @keyframes nm-rise {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
-          from {
-            opacity: 0;
-            transform: scale(.55);
+          @keyframes nm-draw-a {
+            from {
+              transform: scaleX(0);
+            }
+            to {
+              transform: scaleX(1);
+            }
           }
-          to {
-            opacity: 1;
-            transform: scale(1);
+          @keyframes nm-draw-b {
+            from {
+              transform: scaleX(0);
+            }
+            to {
+              transform: scaleX(1);
+            }
           }
-          from {
-            opacity: 0;
-            transform: translateY(10px);
+          @keyframes nm-flow {
+            from {
+              background-position: 0 0,0 0;
+            }
+            to {
+              background-position: calc(18 * var(--u)) 0,0 0;
+            }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+          @keyframes nm-travel {
+            0% {
+              left: var(--ax);
+              top: var(--ay);
+              opacity: 0;
+            }
+            8% {
+              opacity: 1;
+            }
+            92% {
+              opacity: 1;
+            }
+            100% {
+              left: var(--bx);
+              top: var(--by);
+              opacity: 0;
+            }
           }
-          from {
-            transform: scaleX(0);
+          @keyframes nm-pulse {
+            0% {
+              transform: scale(1);
+              opacity: .5;
+            }
+            100% {
+              transform: scale(2);
+              opacity: 0;
+            }
           }
-          to {
-            transform: scaleX(1);
+          @keyframes nm-selpulse {
+            0% {
+              box-shadow: 0 0 0 5px #ffc93c,0 0 0 10px rgba(255,201,60,.3);
+            }
+            100% {
+              box-shadow: 0 0 0 5px #ffc93c,0 0 0 26px rgba(255,201,60,0);
+            }
           }
-          from {
-            transform: scaleX(0);
+          @keyframes nm-drift {
+            from {
+              translate: 0 calc(-3 * var(--u));
+            }
+            to {
+              translate: 0 calc(3 * var(--u));
+            }
           }
-          to {
-            transform: scaleX(1);
+          @keyframes nm-bob {
+            from {
+              transform: translateY(calc(-3 * var(--u)));
+            }
+            to {
+              transform: translateY(calc(3 * var(--u)));
+            }
           }
-          from {
-            background-position: 0 0,0 0;
+          @keyframes nm-slide {
+            from {
+              opacity: 0;
+              transform: translateX(48px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
           }
-          to {
-            background-position: calc(18 * var(--u)) 0,0 0;
+          @keyframes nm-fade {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
           }
-          0% {
-            left: var(--ax);
-            top: var(--ay);
-            opacity: 0;
+          @keyframes nm-orbit {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
           }
-          8% {
-            opacity: 1;
+          @keyframes nm-ring {
+            from {
+              opacity: 0;
+              transform: scale(.6);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
           }
-          92% {
-            opacity: 1;
-          }
-          100% {
-            left: var(--bx);
-            top: var(--by);
-            opacity: 0;
-          }
-          0% {
-            transform: scale(1);
-            opacity: .5;
-          }
-          100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-          0% {
-            box-shadow: 0 0 0 5px #ffc93c,0 0 0 10px rgba(255,201,60,.3);
-          }
-          100% {
-            box-shadow: 0 0 0 5px #ffc93c,0 0 0 26px rgba(255,201,60,0);
-          }
-          from {
-            translate: 0 calc(-3 * var(--u));
-          }
-          to {
-            translate: 0 calc(3 * var(--u));
-          }
-          from {
-            transform: translateY(calc(-3 * var(--u)));
-          }
-          to {
-            transform: translateY(calc(3 * var(--u)));
-          }
-          from {
-            opacity: 0;
-            transform: translateX(48px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-          from {
-            opacity: 0;
-            transform: scale(.6);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-          from {
-            transform: translate(0px,0px) scale(1);
-          }
-          to {
-            transform: translate(var(--tx),var(--ty)) scale(var(--s));
+          @keyframes nm-zoom {
+            from {
+              transform: translate(0px,0px) scale(1);
+            }
+            to {
+              transform: translate(var(--tx),var(--ty)) scale(var(--s));
+            }
           }
           .nm-world {
             transition: transform .7s cubic-bezier(.2,.8,.2,1);
@@ -218,25 +253,31 @@
             background: #241c52;
             border-color: #5b3df5;
           }
-          from {
-            opacity: 0;
-            transform: translate(var(--fx),var(--fy)) scale(.4);
+          @keyframes nm-fan {
+            from {
+              opacity: 0;
+              transform: translate(var(--fx),var(--fy)) scale(.4);
+            }
+            to {
+              opacity: 1;
+              transform: translate(0,0) scale(1);
+            }
           }
-          to {
-            opacity: 1;
-            transform: translate(0,0) scale(1);
+          @keyframes nm-draw-a {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
           }
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
+          @keyframes nm-draw-b {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
           }
         </style>
       </helmet>

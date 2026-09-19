@@ -999,12 +999,6 @@
             const accent = { class: '#8f88ff', event: '#14e0bb', study: '#a49fc4', meeting: '#ff6a5c' }[selected.kind];
             const rec = this.blockDetails()[selected.title]
             || (selected.plan ? this.planRecord(selected.plan) : { badge: 'Block', fields: [], actions: [] });
-            const isPlan = !!selected.plan;
-            const baseActions = showBrief ? ['Back to details', 'Regenerate'] : (rec.actions || []).slice();
-            if (!showBrief && isPlan && baseActions.indexOf('Edit in plan') < 0) {
-              if (baseActions.length > 1) baseActions[1] = 'Edit in plan';
-              else baseActions.push('Edit in plan');
-            }
             const d = days[selected.d];
             // Sit the popup on the far side of the week from the block that is open,
             // so the highlighted block is never behind it.
@@ -1012,6 +1006,13 @@
             const brief = this.briefFor(selected.title);
             const showBrief = st.brief && !!brief;
             const label = 'font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8e88b8;';
+            // Details mode gives a plan block a working way back to the plan page.
+            const isPlan = !!selected.plan;
+            const baseActions = showBrief ? ['Back to details', 'Regenerate'] : (rec.actions || []).slice();
+            if (!showBrief && isPlan && baseActions.indexOf('Edit in plan') < 0) {
+              if (baseActions.length > 1) baseActions[1] = 'Edit in plan';
+              else baseActions.push('Edit in plan');
+            }
             detail = {
               showBrief: showBrief,
               note: showBrief ? 'Sample text · your companion writes this once connected.' : 'Sample data · fields fill from the backend later.',
