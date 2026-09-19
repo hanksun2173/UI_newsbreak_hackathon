@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prep</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#0d0a24;color:#f3f0ff}
+a{color:#b7a7ff}a:hover{color:#d3c9ff}
+button{font-family:inherit}
+@keyframes pd-slide{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes pd-fade{from{opacity:0}to{opacity:1}}
+@keyframes pd-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.pd-drawer{animation:pd-slide .3s cubic-bezier(.2,.8,.2,1)}
+.pd-scrim{animation:pd-fade .25s ease}
+.pd-sk{border-radius:12px;background:linear-gradient(90deg,#241c52 0%,#2e2566 50%,#241c52 100%);background-size:200% 100%;animation:pd-shimmer 1.3s ease-in-out infinite}
+.pd-close:hover{background:#241c52}
+</style>
+</helmet>
+<div style="position: relative; width: 1440px; height: 1100px; box-sizing: border-box; display: flex; overflow: hidden; background: #0d0a24; color: #f3f0ff; font-family: 'Hanken Grotesk', system-ui, sans-serif;">
+
+<!-- SIDEBAR -->
+<div style="width: 250px; flex-shrink: 0; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 20px; background: #120c38; border-right: 1px solid #2a2360;">
+<div style="display: flex; flex-direction: column; gap: 48px;">
+<div style="padding: 0 14px; font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; letter-spacing: -0.01em; color: #ffffff;">[Product name]</div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 17px;">
+<a href="App.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Home</a>
+<a href="Plan.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; background: rgba(255,255,255,0.12); color: #ffffff; text-decoration: none; font-weight: 700;">Plan</a>
+<a href="Events.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Events</a>
+<a href="People.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">People</a>
+<a href="FollowUps.dc.html" style="display: flex; align-items: center; min-height: 48px; padding: 0 14px; border-radius: 14px; color: #e4defc; text-decoration: none; font-weight: 500;">Follow-ups</a>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 14px; padding: 0 14px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 999px; background: #ffc93c; color: #1a1440; font-size: 16px; font-weight: 700;">A</div>
+<div style="font-size: 16px; font-weight: 600; color: #ffffff;">Alex</div>
+</div>
+</div>
+
+<!-- BACKDROP: plan page stand-in, dimmed under the drawer -->
+<div style="flex-grow: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 36px; padding: 56px 64px;">
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #b7a7ff;">Step 2 of 2 · This week</div>
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -0.02em;">Your networking plan</h1>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px;">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 26px 28px; border-radius: 24px; background: #5b3df5; color: #ffffff;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85;">Primary goal</div>
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.15;">Find an AI B2B PM internship</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 26px 28px; border-radius: 24px; background: #241c52; border: 1px solid #3a3080;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Secondary interest</div>
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.15;">Explore the Physical AI industry</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px;">
+<sc-for list="{{ cards }}" as="c" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 18px; padding: 32px; border-radius: 28px; background: #161141; border: 1px solid #2c2360;">
+<div style="display: flex; align-items: center; justify-content: space-between;">
+<div style="{{ c.kindStyle }}">{{ c.kind }}</div>
+<div style="display: flex; align-items: center; height: 34px; padding: 0 14px; border-radius: 999px; background: #14c8a8; color: #1a1440; font-size: 13px; font-weight: 800; letter-spacing: 0.06em;">{{ c.status }}</div>
+</div>
+<div style="font-family: 'Instrument Serif', Georgia, serif; font-size: 36px; line-height: 1.05;">{{ c.title }}</div>
+<div style="font-size: 16px; font-weight: 600;">{{ c.when }}</div>
+<button type="button" onClick="{{ c.open }}" style="{{ c.btnStyle }}">Prepare</button>
+</div>
+</sc-for>
+</div>
+</div>
+
+<!-- SCRIM -->
+<div class="pd-scrim" onClick="{{ close }}" style="position: absolute; inset: 0; background: rgba(6,4,20,0.62); cursor: pointer;"></div>
+
+<!-- DRAWER -->
+<div class="pd-drawer" role="dialog" aria-modal="true" style="position: absolute; top: 0; right: 0; bottom: 0; width: 580px; box-sizing: border-box; display: flex; flex-direction: column; background: #161141; border-left: 1px solid #3a3080; box-shadow: -30px 0 80px -30px rgba(0,0,0,0.85); overflow-y: auto;">
+
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 32px 36px 22px 36px; border-bottom: 1px solid #2c2360;">
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; gap: 8px;">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+<button type="button" onClick="{{ t.pick }}" aria-pressed="{{ t.active }}" style="{{ t.style }}">{{ t.label }}</button>
+</sc-for>
+</div>
+<h2 style="margin: 6px 0 0 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 36px; line-height: 1.05; letter-spacing: -0.015em;">{{ sel.title }}</h2>
+<div style="font-size: 15px; color: #a9a3cf;">{{ sel.subtitle }}</div>
+</div>
+<a href="Plan.dc.html" class="pd-close" aria-label="Close" style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; border: 2px solid #3a3080; color: #b7a7ff; font-size: 22px; text-decoration: none;">×</a>
+</div>
+
+<!-- Loading skeleton -->
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 14px; padding: 28px 36px 48px 36px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Writing your briefing…</div>
+<div class="pd-sk" style="height: 96px;"></div>
+<div class="pd-sk" style="height: 14px; width: 120px;"></div>
+<div class="pd-sk" style="height: 52px;"></div>
+<div class="pd-sk" style="height: 52px;"></div>
+<div class="pd-sk" style="height: 14px; width: 150px;"></div>
+<div class="pd-sk" style="height: 52px;"></div>
+<div class="pd-sk" style="height: 52px;"></div>
+<div class="pd-sk" style="height: 14px; width: 160px;"></div>
+<div class="pd-sk" style="height: 60px;"></div>
+<div class="pd-sk" style="height: 60px;"></div>
+</div>
+</sc-if>
+
+<!-- Content -->
+<sc-if value="{{ !loading }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 28px; padding: 28px 36px 48px 36px;">
+
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">Why this matters</div>
+<div style="padding: 22px 24px; border-radius: 20px; background: #241c52; border: 1px solid #3a3080; font-size: 17px; line-height: 1.55;">{{ sel.why }}</div>
+</div>
+
+<sc-for list="{{ sel.sections }}" as="s" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #b7a7ff;">{{ s.label }}</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<sc-for list="{{ s.items }}" as="it" hint-placeholder-count="3">
+<div style="{{ it.style }}">
+<sc-if value="{{ it.n }}" hint-placeholder-val="{{ false }}">
+<div style="width: 22px; flex-shrink: 0; font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; line-height: 1; color: #ffc93c;">{{ it.n }}</div>
+</sc-if>
+<div>{{ it.text }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+
+<div style="display: flex; align-items: center; gap: 14px; padding-top: 8px;">
+<a href="Plan.dc.html" style="display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 26px; border-radius: 999px; background: #5b3df5; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none;">Back to plan</a>
+<button type="button" onClick="{{ regen }}" style="min-height: 52px; padding: 0 22px; border-radius: 999px; background: transparent; color: #b7a7ff; border: 2px solid #3a3080; font-size: 15px; font-weight: 600; cursor: pointer;">Regenerate</button>
+</div>
+
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { kind: 'person', loading: false };
+}
+renderVals() {
+const st = this.state;
+const preps = {
+person: {
+label: 'Priya Patel',
+title: 'Priya Patel',
+subtitle: 'AI Product Manager, Series D B2B AI Startup · Wednesday 4:00 PM',
+why: 'Priya sits exactly where you want to be: an AI PM shipping enterprise products at a B2B company that takes PM interns. A strong conversation with her turns a cold application into a warm referral.',
+sections: [
+{ label: 'What to bring', items: [
+'A two-minute story about a B2B SaaS feature you shipped, framed around the customer discovery and GTM work you led.',
+'One concrete opinion about how AI changes enterprise PM work, so the conversation goes beyond asking for a job.',
+'A specific ask: whether her team is taking PM interns and who owns that decision.' ] },
+{ label: 'What to learn', items: [
+'How her team splits work between PMs and ML engineers on AI features.',
+'What her company looks for when it evaluates PM intern candidates.',
+'Which enterprise AI problems she thinks are still unsolved.' ] },
+{ label: 'Questions to ask', numbered: true, items: [
+'When you moved into AI product work, what part of your enterprise SaaS experience transferred and what did you have to relearn?',
+'How do you scope an AI feature when the model\'s behavior is not fully predictable?',
+'If I wanted to be a strong intern candidate on your team next summer, what would you want to see from me in the next three months?' ] }
+]
+},
+event: {
+label: 'Physical AI & Robotics Panel',
+title: 'Physical AI & Robotics Panel',
+subtitle: 'Saturday 5:00 PM · Innovation Hub, Main Hall',
+why: 'The panel is the fastest way to get a real read on the Physical AI industry from people shipping robots, and the mixer afterward is where product roles in robotics get discussed candidly.',
+sections: [
+{ label: 'What to explore', items: [
+'How robotics teams handle product decisions when deployment is physical and slow to iterate.',
+'Which companies on the panel have product managers at all, and what those PMs actually own.',
+'Where simulation and VLA models are changing the pace of product work.' ] },
+{ label: 'Priorities, in order', numbered: true, items: [
+'Note one specific question during the panel and ask it in the Q&A.',
+'Talk to at least one panelist and one attendee who works on the product side.',
+'Ask each person you meet who else you should be talking to in Physical AI.' ] },
+{ label: 'Questions to ask', numbered: true, items: [
+'What does a product manager do differently at a robotics company compared to a pure software company?',
+'Where does customer discovery break down when the product is a robot in a warehouse?',
+'Which skills from enterprise SaaS product work would you want a new hire to bring into Physical AI?' ] }
+]
+}
+};
+const kindPill = {
+person: 'display:flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:700;background:#2e2470;color:#b7a7ff;',
+event: 'display:flex;align-items:center;height:32px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:700;background:#0d3d3a;color:#4be3c6;'
+};
+const load = (kind) => {
+this.setState({ kind: kind, loading: true });
+setTimeout(() => this.setState({ loading: false }), 900);
+};
+const tabs = ['person', 'event'].map((k) => {
+const active = st.kind === k;
+return {
+label: k === 'person' ? 'Person prep' : 'Event prep',
+active: active,
+style: 'height:36px;padding:0 16px;border:0;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;' + (active ? kindPill[k].split('cursor')[0] + 'background:#5b3df5;color:#ffffff;' : 'background:#241c52;color:#b7a7ff;'),
+pick: () => { if (!active) load(k); }
+};
+});
+const p = preps[st.kind];
+const sel = {
+title: p.title,
+subtitle: p.subtitle,
+why: p.why,
+sections: p.sections.map((s) => ({
+label: s.label,
+items: s.items.map((t, i) => ({
+n: s.numbered ? String(i + 1) : '',
+text: t,
+style: 'display:flex;gap:14px;padding:14px 18px;border-radius:14px;font-size:15px;line-height:1.5;border:1px solid #3a3080;background:' + (s.numbered ? '#241c52' : '#0d0a24') + ';'
+}))
+}))
+};
+const cards = [
+{ id: 'person', kind: 'Person to meet', status: 'BOOKED ✓', title: 'Priya Patel', when: 'Wednesday 4:00 PM' },
+{ id: 'event', kind: 'Event to attend', status: 'REGISTERED ✓', title: 'Physical AI & Robotics Panel', when: 'Saturday 5:00 PM' }
+].map((c) => ({
+...c,
+kindStyle: kindPill[c.id],
+btnStyle: 'align-self:flex-start;min-height:52px;padding:0 26px;border-radius:999px;border:2px solid #5b3df5;background:#5b3df5;color:#ffffff;font-size:16px;font-weight:700;cursor:pointer;',
+open: () => load(c.id)
+}));
+return {
+tabs: tabs,
+sel: sel,
+cards: cards,
+loading: st.loading,
+regen: () => load(st.kind),
+close: () => { window.location.href = 'Plan.dc.html'; }
+};
+}
+}
+</script>
+</body>
+</html>
